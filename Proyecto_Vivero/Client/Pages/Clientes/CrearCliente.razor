@@ -1,0 +1,31 @@
+﻿@page "/crear-cliente"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+@using Proyecto_Vivero.Shared
+
+<h2><b>Nuevo cliente</b></h2>
+
+<ComponenteFormCliente cliente="cliente" TextBotonSubmit=" Agregar Cliente" 
+                       OnValidSubmit="@CrearClient" />
+
+@code {
+    public Cliente cliente = new Cliente();
+
+    async Task CrearClient()
+    {
+        var respuesta = await Http.PostAsJsonAsync("api/clientes", cliente);
+
+        if (respuesta.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("simple", "¡Éxito!", "Cliente creado", "success");
+            NavigationManager.NavigateTo("/lista-clientes");
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("simple", "Error",
+                    "No se pudo crear cliente", "error");
+        }
+    }
+}

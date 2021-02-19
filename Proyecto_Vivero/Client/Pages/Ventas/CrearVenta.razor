@@ -1,0 +1,48 @@
+﻿@page "/crear-venta"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+@using Proyecto_Vivero.Shared
+
+<h2><b>Nueva venta</b></h2>
+
+<ComponenteFormVenta textSubmit=" Finalizar venta" OnValidSubmit="CrearVent" venta="venta"
+                     empleado="empleado" clientes="clientes" articulos="articulos"></ComponenteFormVenta>
+
+@code {
+    public Venta venta = new Venta();
+    public Empleado empleado = new Empleado();
+    public List<Cliente> clientes { get; set; } = new List<Cliente>();
+    public List<Articulo> articulos { get; set; } = new List<Articulo>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        int idempleado = 1;
+        empleado = await Http.GetFromJsonAsync<Empleado>("api/empleados/" + idempleado); //traigo empleado seleccionado
+        venta.EmpleadoId = idempleado;
+        clientes = await Http.GetFromJsonAsync<List<Cliente>>("api/clientes"); //muestro todos los clientes
+        articulos = await Http.GetFromJsonAsync<List<Articulo>>("api/articulos"); //muestro todos los articulos
+    }
+
+    async Task CrearVent()
+    {
+        var confirmacion = await JS.InvokeAsync<bool>("confirmar", "¿Finalizar venta?",
+            $"Total: ${venta.Total}. Forma de pago: {venta.FormaPago}", "question");
+        if (confirmacion)
+        {
+            var respuesta = await Http.PostAsJsonAsync("api/ventas", venta);
+            var cuerporespuest = await respuesta.Content.ReadAsStringAsync();
+
+            if (respuesta.IsSuccessStatusCode)
+            {
+                await JS.InvokeVoidAsync("simple", "¡Éxito!", "Venta finalizada", "success");
+                NavigationManager.NavigateTo("/ver-venta/" + cuerporespuest);
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("simple", "Error", "No se pudo realizar venta", "error");
+            }
+        }
+    }
+}

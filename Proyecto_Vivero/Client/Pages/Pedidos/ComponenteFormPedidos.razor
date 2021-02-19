@@ -1,0 +1,121 @@
+﻿@using Proyecto_Vivero.Shared
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<EditForm Model="@pedido" OnValidSubmit="OnValidSubmit">
+    <div class="form-field m-2">
+        <div class="form-group row">
+            <label class="col-3 col-form-label">Cliente</label>
+            <div class="col">
+                <div class="input-group">
+                    <InputSelect @bind-Value="pedido.ClienteId" class="custom-select" name="cliente">
+                        <option selected value="0">Seleccione cliente</option>
+                        @foreach (var cliente in clientes)
+                        {
+                            <option value="@cliente.Id">@cliente.NombreyApellido | DNI:@cliente.Dni</option>
+                        }
+                    </InputSelect>
+                </div>
+                <ValidationMessage For="@(() => pedido.ClienteId)" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            @for (int i = 0; i < pedido.DetallePedidos.Count; i++)
+            {
+                var indice = i;
+                var detalle = pedido.DetallePedidos[i];
+
+                <h5>Ítem #@(i + 1)</h5>
+
+                <div class="card" style="background-color:lightgrey; border-radius:1rem">
+                    <div class="form-group m-2">
+                        <div class="row">
+                            <div class="col-5">
+                                <label>Artículo </label>
+                            </div>
+                            <div class="col">
+                                <label>Cantidad </label>
+                            </div>
+                            <div class="col"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-5">
+                                <InputSelect @bind-Value="detalle.ArticuloId" required class="form-control">
+                                    <option selected value="">Seleccione un artículo</option>
+                                    @foreach (var articulo in articulos)
+                                        {
+                                        <option value="@articulo.Id">@articulo.Nombre | $@articulo.PrecioUnitario | STOCK: @articulo.StockActual</option>
+                                        }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => detalle.ArticuloId)" />
+                            </div>
+                            <div class="col">
+                                <InputNumber @bind-Value="detalle.Cantidad" class="form-control" min="1" />
+                                <ValidationMessage For="@(() => detalle.Cantidad)" />
+                            </div>
+                            <div class="col">
+                                <button type="button" @onclick="@(() => pedido.DetallePedidos.RemoveAt(indice))" class="btn btn-danger btn-sm" style="border-radius:10px">
+                                    <i class="oi oi-trash"></i><text style="color:white"> Quitar ítem @(indice+1)</text>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="form-group m-2">
+                <button type="button" class="btn btn-success"
+                        @onclick="@(() => pedido.DetallePedidos.Add(new DetallePedido()))">
+                    Agregar ítem
+                </button>
+            </div>
+
+            <hr />
+
+            <div class="form-group row">
+                <label class="col-3 col-form-label">Seña</label>
+                <div class="col">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">$</span>
+                        </div>
+                        <InputNumber @bind-Value="pedido.Seña" class="form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => pedido.Seña)" />
+                </div>
+            </div>
+
+            <div class="form-group d-flex align-items-center row">
+                <label class="col-3 col-form-label">Finalizado</label>
+                <div class="col">
+                    <InputCheckbox @bind-Value="pedido.Finalizado" />
+                </div>
+                <ValidationMessage For="@(() => pedido.Finalizado)" />
+            </div>
+
+            <div class="d-flex justify-content-start">
+                <div class="btn-group btn-block">
+                    <button @onclick="@Volver" class="btn btn-secondary"><i class="oi oi-arrow-circle-left"></i><text style="color:white"> Volver atrás</text></button>
+                    <button type="submit" class="btn btn-success"><i class="oi oi-check"></i><text style="color:white"> @textSubmit</text></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <DataAnnotationsValidator />
+</EditForm>
+
+@code {
+    [Parameter] public Pedido pedido { get; set; } = new Pedido();
+    [Parameter] public List<Cliente> clientes { get; set; } = new List<Cliente>();
+    [Parameter] public List<Articulo> articulos { get; set; } = new List<Articulo>();
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+
+    [Parameter] public string textSubmit { get; set; } = "Guardar Pedido";
+
+    void Volver()
+    {
+        NavigationManager.NavigateTo("/lista-pedidos");
+    }
+}

@@ -1,0 +1,98 @@
+﻿@using Proyecto_Vivero.Shared
+@inject NavigationManager NavigationManager
+
+<EditForm Model="@cliente" OnValidSubmit="@OnValidSubmit">
+    <div class="form-field m-2">
+        <div class="form-group row">
+            <label class="col-3 col-form-label">Nombre y Apellido</label>
+            <div class="col">
+                <div class="input-group">
+                    <InputText @bind-Value="@cliente.NombreyApellido" oninput="this.value=this.value.toUpperCase()" class="form-control" />
+                </div>
+                <ValidationMessage For="@(() => cliente.NombreyApellido)" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-3 col-form-label">DNI</label>
+            <div class="col">
+                <div class="input-group">
+                    <InputText @bind-Value="@cliente.Dni" class="form-control" readonly="@oculta" />
+                </div>
+                <ValidationMessage For="@(() => cliente.Dni)" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-3 col-form-label">Sexo</label>
+            <div class="col">
+                <div class="input-group">
+                    <InputSelect @bind-Value="cliente.Sexo" class="form-control">
+                        @foreach (string sexo in Enum.GetNames(typeof(Cliente.Sexos)))
+                        {
+                            <option value="@sexo"> @sexo</option>
+                        }
+                    </InputSelect>
+                </div>
+                <ValidationMessage For="@(() => cliente.Sexo)" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-3 col-form-label">Dirección</label>
+            <div class="col">
+                <div class="input-group">
+                    <InputText @bind-Value="@cliente.Dirección" class="form-control" oninput="this.value=this.value.toUpperCase()" />
+                </div>
+                <ValidationMessage For="@(() => cliente.Dirección)" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-3 col-form-label">Teléfono</label>
+            <div class="col">
+                <div class="input-group">
+                    <InputText @bind-Value="@cliente.Teléfono" class="form-control" oninput="this.value=this.value.toUpperCase()" />
+                </div>
+                <ValidationMessage For="@(() => cliente.Teléfono)" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-3 col-form-label">Saldo cuenta</label>
+            <div class="col">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-default">$</span>
+                    </div>
+                    <InputNumber @bind-Value="@cliente.Saldo" step="0.01" class="form-control" />
+                    <ValidationMessage For="@(() => cliente.Saldo)" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center m-2">
+        <div class="btn-group btn-block">
+            <button type="submit" class="btn btn-success">
+                <i class="@ImgBotonSubmit"></i>
+                <text style="color:white">@TextBotonSubmit</text>
+            </button>
+            <button @onclick="@Volver" class="btn btn-secondary"><i class="oi oi-arrow-circle-left"></i><text style="color:white"> Volver atrás</text></button>
+        </div>
+    </div>
+    <DataAnnotationsValidator />
+</EditForm>
+
+@code {
+    [Parameter] public Cliente cliente { get; set; } = new Cliente();
+    [Parameter] public string ImgBotonSubmit { get; set; } = "oi oi-check";
+    [Parameter] public string TextBotonSubmit { get; set; } = "Agregar Cliente";
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+    [Parameter] public bool oculta { get; set; } = false;
+
+    void Volver()
+    {
+        NavigationManager.NavigateTo("/lista-clientes");
+    }
+}

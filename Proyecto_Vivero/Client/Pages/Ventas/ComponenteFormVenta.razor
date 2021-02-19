@@ -1,0 +1,195 @@
+﻿@using Proyecto_Vivero.Shared
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+
+<EditForm Model="@venta" OnValidSubmit="OnValidSubmit">
+    <div class="form-field m-2">
+        <div class="form-group row">
+            <label class="col-3 col-form-label">Empleado</label>
+            <div class="col">
+                <div class="input-group">
+                    <InputNumber @bind-Value="venta.EmpleadoId" class="form-control" hidden />
+                    <InputText @bind-Value="empleado.NombreyApellido" class="form-control-plaintext" readonly />
+                </div>
+                <ValidationMessage For="@(() => venta.EmpleadoId)" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-3 col-form-label">Forma de Pago</label>
+            <div class="col">
+                <div class="input-group">
+                    <InputSelect @bind-Value="venta.FormaPago" class="form-control">
+                        @foreach (string fpago in Enum.GetNames(typeof(FormasPago)))
+                        {
+                            <option value="@fpago"> @fpago</option>
+                        }
+                    </InputSelect>
+                </div>
+                <ValidationMessage For="@(() => venta.FormaPago)" />
+            </div>
+        </div>
+
+        @if (venta.FormaPago == FormasPago.CuentaCorriente)
+        {
+            ocultaclientes = false;
+        }
+        else
+        {
+            ocultaclientes = true;
+            venta.ClienteId = null;
+        }
+
+        @if (venta.FormaPago == FormasPago.CuentaCorriente && venta.ClienteId == null)
+        {
+            venta.ClienteId = 0;
+        }
+
+        <div class="form-group row" hidden="@ocultaclientes">
+            <label class="col-3 col-form-label">Cliente</label>
+            <div class="col">
+                <div class="input-group">
+                    <InputSelect @bind-Value="venta.ClienteId" class="form-control">
+                        <option selected value="0">Seleccione cliente</option>
+                        @foreach (var cliente in clientes)
+                        {
+                            <option value="@cliente.Id">@cliente.NombreyApellido | DNI:@cliente.Dni</option>
+                        }
+                    </InputSelect>
+                </div>
+                <ValidationMessage For="@(() => venta.ClienteId)" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            @for (int i = 0; i < venta.DetalleVentas.Count; i++)
+            {
+                var indice = i;
+                var detalle = venta.DetalleVentas[i];
+                listadetalle = venta.DetalleVentas;
+
+                <div class="d-flex justify-content-between">
+                    <h5>Ítem #@(i + 1)</h5>
+                </div>
+
+                <div class="card m-1" style="background-color:lightgrey;border-radius:1rem">
+                    <div class="row m-1">
+                        <div class="col-12 form-group">
+                            <div class="d-flex justify-content-between align-items-center m-1">
+                                <label>Artículo</label>
+                                <button type="button" @onclick="@(() => venta.DetalleVentas.RemoveAt(indice))" class="btn btn-danger btn-sm" style="border-radius:10px">
+                                    <i class="oi oi-trash"></i><text style="color:white">Quitar ítem @(indice+1)</text>
+                                </button>
+                            </div>
+                            <InputSelect @bind-Value="detalle.ArticuloId" required class="form-control">
+                                <option selected value="">Seleccione un artículo</option>
+                                @foreach (var articulo in articulos)
+                                    {
+                                        if (articulo.StockActual > 0)
+                                        {
+                                        <option value="@articulo.Id">@articulo.Nombre | $@articulo.PrecioUnitario | STOCK: @articulo.StockActual</option>
+                                        }
+                                    }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => detalle.ArticuloId)" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-1 mr-1 ml-1">
+                        <div class="col-4 form-group">
+                            <label>Cantidad</label>
+                            @foreach (var art in articulos)
+                            {
+                                if (detalle.ArticuloId == art.Id)
+                                {
+                                    cantidadmax = art.StockActual;
+                                }
+                            }
+                            <InputNumber @bind-Value="detalle.Cantidad" class="form-control" min="1" max="@cantidadmax" />
+                            <ValidationMessage For="@(() => detalle.Cantidad)" />
+                        </div>
+
+                        <div class="col-4 form-group">
+                            <label>Descuento</label>
+                            <InputNumber @bind-Value="detalle.Descuento" class="form-control" min="-100" max="100" />
+                            <ValidationMessage For="@(() => detalle.Descuento)" />
+                        </div>
+
+                        <div class="col-4 form-group">
+                            <label>Subtotal</label>
+                            @foreach (var art in articulos)
+                            {
+                                if (detalle.ArticuloId == art.Id)
+                                {
+                                    detalle.SubTotal = detalle.CalcularSubTotal(detalle.Cantidad,
+                                        art.PrecioUnitario, detalle.Descuento);
+                                }
+                            }
+                            <input @bind-value="detalle.SubTotal" type="number" step="0.001" class="form-control" />
+                            <ValidationMessage For="@(() => detalle.SubTotal)" />
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="form-group m-2">
+                <button type="button" class="btn btn-success"
+                        @onclick="@(() => venta.DetalleVentas.Add(new DetalleVenta()))">
+                    Agregar ítem
+                </button>
+            </div>
+
+            <div class="d-flex justify-content-end m-2">
+                <button @onclick="@(() => CalcularTotal())" type="button" class="btn btn-light">
+                    <h4><b>TOTAL</b></h4>
+                    @if (venta.Total != 0)
+                    {
+                        <h3><b>$@venta.Total</b></h3>
+                    }
+                </button>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <div class="btn-group btn-block">
+                    <button @onclick="@(() => CalcularTotal())" type="submit" class="btn btn-success"><i class="oi oi-check"></i><text style="color:white"> @textSubmit</text></button>
+                    <button @onclick="@Volver" class="btn btn-danger"><i class="oi oi-x"></i><text style="color:white"> Cancelar y volver atrás</text></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <DataAnnotationsValidator />
+</EditForm>
+
+@code {
+    [Parameter] public Venta venta { get; set; } = new Venta();
+    [Parameter] public Empleado empleado { get; set; } = new Empleado();
+    [Parameter] public List<Cliente> clientes { get; set; } = new List<Cliente>();
+    [Parameter] public List<Articulo> articulos { get; set; } = new List<Articulo>();
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+
+    [Parameter] public string textSubmit { get; set; } = "Finalizar Venta";
+
+    public bool ocultaclientes = true;
+
+    public List<DetalleVenta> listadetalle { get; set; } = new List<DetalleVenta>();
+
+    public int cantidadmax { get; set; } //cantidad maxima de un articulo por su stock
+
+    decimal CalcularTotal()
+    {
+        venta.Total = 0;
+        if (listadetalle.Count > 0)
+        {
+            @for (int i = 0; i < listadetalle.Count; i++)
+            {
+                venta.Total += listadetalle[i].SubTotal;
+            }
+        }
+        return venta.Total;
+    }
+
+    void Volver()
+    {
+        NavigationManager.NavigateTo("/lista-ventas");
+    }
+}

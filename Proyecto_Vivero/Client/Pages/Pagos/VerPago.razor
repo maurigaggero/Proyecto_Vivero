@@ -1,0 +1,113 @@
+﻿@page "/ver-pago/{idpago:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+@using Proyecto_Vivero.Shared
+
+<div class="d-flex justify-content-between m-2">
+    <div class="btn-group">
+        <button class="btn btn-sm btn-secondary" @onclick="@Volver">
+            Volver atrás
+        </button>
+        <button class="btn btn-sm btn-primary" onclick="window.print()">
+            Imprimir
+        </button>
+    </div>
+    <div class="btn-group">
+        <button @onclick="@(() => BorrarPago(pago.Id))" class="btn btn-sm btn-danger">
+            <i class="oi oi-trash"></i>Eliminar pago
+        </button>
+    </div>
+</div>
+
+@if (pago != null)
+{
+    <div class="card m-2" style="margin:25px; background-color:#f4f4f4; border-style:dotted">
+        <div class="card-body">
+            <h4 class="card-title d-flex justify-content-center">
+                <b>RECIBO</b>
+            </h4>
+
+            <div class="d-flex justify-content-between">
+                <b>VIVERO BRITH</b>
+                <text><b>N° COMPROBANTE:</b> @pago.Id</text>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <text>Tienda de vivero y jardineria</text>
+                <text><b>FECHA:</b> @pago.Fecha</text>
+            </div>
+            <div class="d-flex justify-content-between">
+                <text>H. Irigoyen esq. Córdoba, Río Segundo</text>
+                <text><b>EMPLEADO:</b> @pago.Empleado.NombreyApellido</text>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <text>3572550166</text>
+            </div>
+
+            <hr />
+            <div class="text-left">
+                <text><b>CLIENTE:</b> @pago.Cliente.NombreyApellido</text> <br />
+                <text><b>DIRECCIÓN:</b> @pago.Cliente.Dirección</text> <br />
+                <text><b>TELÉFONO:</b> @pago.Cliente.Teléfono</text>
+            </div>
+            <hr />
+
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th style="text-align:justify">CONCEPTO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align:justify">Pago cuenta corriente N° @pago.Cliente.Dni</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p class="card-text text-right" style="margin:1.5rem">
+                <h5><b>IMPORTE</b></h5>
+                <h4><b>$@pago.Importe</b></h4>
+            </p>
+        </div>
+    </div>
+}
+
+@code {
+    public Pago pago { get; set; }
+
+    [Parameter] public int idpago { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        pago = await Http.GetFromJsonAsync<Pago>($"api/pagos/{idpago}");
+    }
+
+    async Task BorrarPago(int idpago)
+    {
+        var confirmacion = await JS.InvokeAsync<bool>("confirmar", "¿Eliminar pago?",
+            $"Pago N° {pago.Id}. Fecha: {pago.Fecha}", "warning");
+        if (confirmacion)
+        {
+            var respuesta = await Http.DeleteAsync($"/api/pagos/{idpago}");
+
+            if (respuesta.IsSuccessStatusCode)
+            {
+                await JS.InvokeVoidAsync("simple", "¡Exito!", "Pago eliminado", "success");
+                NavigationManager.NavigateTo("lista-pagos");
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("simple", "Error", "No se pudo eliminar pago", "error");
+            }
+        }
+    }
+
+    void Volver()
+    {
+        NavigationManager.NavigateTo("lista-pagos");
+    }
+}

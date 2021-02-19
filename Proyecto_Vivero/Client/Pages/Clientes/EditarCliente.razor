@@ -1,0 +1,71 @@
+﻿@page "/editar-cliente/{idcliente:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+@using Proyecto_Vivero.Shared
+
+<div class="d-flex justify-content-between m-2">
+    <h2><b>Editar cliente</b></h2>
+    <button @onclick="@(() => BorrarCliente(cliente.Id))" class="btn btn-danger">
+        <i class="oi oi-trash"></i> Eliminar cliente
+    </button>
+</div>
+
+<ComponenteFormCliente cliente="cliente" OnValidSubmit="@EditarClient"
+                       oculta="oculta" TextBotonSubmit=" Editar Cliente" />
+
+@code {
+    public Cliente cliente = new Cliente();
+    [Parameter] public int idcliente { get; set; }
+    public bool oculta = true;
+
+    protected async override Task OnParametersSetAsync()
+    {
+        cliente = await Http.GetFromJsonAsync<Cliente>($"api/clientes/{idcliente}");
+    }
+
+    async Task BorrarCliente(int idcliente)
+    {
+        var confirmacion = await JS.InvokeAsync<bool>("confirmar", "Eliminar",
+            $"¿Desea eliminar cliente {cliente.NombreyApellido}?", "warning");
+        if (confirmacion)
+        {
+            var respuesta = await Http.DeleteAsync($"api/clientes/{idcliente}");
+
+            if (respuesta.IsSuccessStatusCode)
+            {
+                await JS.InvokeVoidAsync("simple", "¡Éxito!",
+                    "Cliente eliminado", "success");
+                NavigationManager.NavigateTo("/lista-clientes");
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("simple", "Error",
+                    "No se pudo eliminar cliente", "error");
+            }
+        }
+    }
+
+    async Task EditarClient()
+    {
+        var confirmacion = await JS.InvokeAsync<bool>("confirmar", "Editar",
+            $"¿Desea editar {cliente.NombreyApellido}?", "question");
+        if (confirmacion)
+        {
+            var respuesta = await Http.PutAsJsonAsync("api/clientes", cliente);
+
+            if (respuesta.IsSuccessStatusCode)
+            {
+                await JS.InvokeVoidAsync("simple", "¡Éxito!",
+                    "Cliente editado", "success");
+                NavigationManager.NavigateTo("/lista-clientes");
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("simple", "Error",
+                    $"No se pudo editar cliente", "error");
+            }
+        }
+    }
+}

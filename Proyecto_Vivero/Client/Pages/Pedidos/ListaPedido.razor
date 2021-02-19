@@ -1,0 +1,194 @@
+﻿@page "/lista-pedidos"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+@using System.Text.Json
+@using Proyecto_Vivero.Shared
+
+<div class="d-flex position-sticky justify-content-between m-1">
+    <div class="btn-group mr-2">
+        <button @onclick="NuevoPedido" class="btn btn-success"><i class="oi oi-plus"></i> Nuevo pedido</button>
+    </div>
+    <div class="input-group" style="width:60%">
+        <input class="form-control" type="text" placeholder="Nombre cliente" @bind="ClienteFiltro" />
+        <input class="form-control" type="text" placeholder="Nombre artículo" @bind="ArticuloFiltro" />
+        <div class="input-group-append">
+            <button @onclick="Filtrar" class="btn btn-primary" type="button"><i class="oi oi-magnifying-glass"></i></button>
+            <button @onclick="Limpiar" class="btn btn-danger" type="button"><i class="oi oi-delete"></i></button>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-start">
+    <div class="form-inline m-1">
+        <button @onclick="MostrarTodos" style="background:none; border: none">
+            <b>Ver todos</b>
+        </button>
+        <button @onclick="MostrarPendientes" style="background:none; border: none">
+            <b>Sólo pendientes</b>
+        </button>
+    </div>
+</div>
+
+@if (pedidos == null)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height:24rem">
+        <div class="spinner-grow text-success" role="status">
+            <span class="sr-only">Cargando...</span>
+        </div>
+    </div>
+}
+else if (pedidos.Count == 0)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height:24rem">
+        <text>No se encontraron pedidos.</text>
+    </div>
+}
+else
+{
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th></th>
+                <th></th>
+                <th>#</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Seña</th>
+                <th>Detalle</th>
+                <th>Finalizado</th>
+            </tr>
+        </thead>
+        <tbody>
+            <Virtualize Items="@pedidos" Context="pedido">
+                <tr @key="pedido.Id">
+                    <td><a href="/editar-pedido/@pedido.Id" style="color:white" class="btn btn-sm btn-warning"><i class="oi oi-pencil" aria-hidden="true"></i></a></td>
+                    <td><button @onclick="@(() => BorrarPedido(pedido.Id))" class="btn btn-sm btn-danger"><i class="oi oi-trash" aria-hidden="true"></i></button></td>
+                    <td>@pedido.Id</td>
+                    <td><b>@pedido.Cliente.NombreyApellido</b></td>
+                    <td><b>@pedido.Fecha</b></td>
+                    <td>$@pedido.Seña</td>
+                    <td>
+                        <button @onclick="OcultaDetalle" class="btn btn-sm btn-outline-secondary">Mostrar</button>
+                        <button @onclick="MuestraDetalle" class="btn btn-sm btn-outline-success">Ocultar</button>
+                        <table hidden="@oculto" class="table table-sm">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Artículo</th>
+                                    <th>Cantidad</th>
+                                </tr>
+                            </thead>
+                            @foreach (var detalle in pedido.DetallePedidos)
+                            {
+                                <tbody>
+                                    <tr>
+                                        <td>@detalle.Articulo.Nombre</td>
+                                        <td>@detalle.Cantidad</td>
+                                    </tr>
+                                </tbody>
+                            }
+                        </table>
+                    </td>
+                    <td>
+                        <input type="checkbox" @bind="pedido.Finalizado"
+                               @onclick="@(() => Finalizado(pedido.Id, pedido.Finalizado))">
+                    </td>
+                </tr>
+            </Virtualize>
+        </tbody>
+    </table>
+}
+@code {
+    public List<Pedido> pedidos { get; set; }
+
+    protected bool oculto = true;
+
+    private string ClienteFiltro = String.Empty;
+    private string ArticuloFiltro = String.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarPedidos();
+    }
+
+    async Task CargarPedidos()
+    {
+        var httpResponse = await Http.GetAsync($"api/pedidos/filtro?cliente={ClienteFiltro}&articulo={ArticuloFiltro}");
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            var responseString = await httpResponse.Content.ReadAsStringAsync();
+            pedidos = JsonSerializer.Deserialize<List<Pedido>>(responseString,
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        }
+        else
+        {
+            Console.WriteLine("error");
+        }
+    }
+
+    async Task Finalizado(int idpedido, bool finalizado)
+    {
+        var pedido = pedidos.FirstOrDefault(x => x.Id == idpedido);
+        await Http.PutAsJsonAsync($"api/pedidos/finalizado/{!finalizado}", pedido);
+        await CargarPedidos();
+    }
+
+    void MuestraDetalle()
+    {
+        oculto = true;
+    }
+
+    void OcultaDetalle()
+    {
+        oculto = false;
+    }
+
+    async Task MostrarTodos()
+    {
+        await CargarPedidos();
+    }
+
+    void MostrarPendientes()
+    {
+        pedidos = pedidos.Where(x => x.Finalizado == false).ToList();
+    }
+
+    async Task BorrarPedido(int idpedido)
+    {
+        var seleccion = pedidos.FirstOrDefault(x => x.Id == idpedido);
+        var confirmacion = await JS.InvokeAsync<bool>("confirmar", "¿Eliminar pedido?",
+            $"Cliente {seleccion.Cliente.NombreyApellido}. Fecha: {seleccion.Fecha}", "warning");
+        if (confirmacion)
+        {
+            var respuesta = await Http.DeleteAsync($"/api/pedidos/{idpedido}");
+
+            if (respuesta.IsSuccessStatusCode)
+            {
+                await JS.InvokeVoidAsync("simple", "¡Exito!", "Pedido eliminado", "success");
+                await CargarPedidos();
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("simple", "Error", "No se pudo eliminar pedido", "error");
+            }
+        }
+    }
+
+    void NuevoPedido()
+    {
+        NavigationManager.NavigateTo("crear-pedido");
+    }
+
+    private async Task Filtrar()
+    {
+        await CargarPedidos();
+    }
+
+    private async Task Limpiar()
+    {
+        ClienteFiltro = string.Empty;
+        ArticuloFiltro = string.Empty;
+        await CargarPedidos();
+    }
+}

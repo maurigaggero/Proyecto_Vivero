@@ -1,0 +1,43 @@
+﻿@page "/editar-venta/{idventa:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+@using Proyecto_Vivero.Shared
+
+<h2><b>Editar venta</b></h2>
+
+<ComponenteFormVenta textSubmit=" Finalizar venta" OnValidSubmit="EditVenta" venta="venta"
+                     empleado="empleado" clientes="clientes" articulos="articulos"></ComponenteFormVenta>
+
+@code {
+    [Parameter] public int idventa { get; set; } //parametro id venta
+    public Venta venta = new Venta();
+    public Empleado empleado = new Empleado();
+    public List<Cliente> clientes { get; set; } = new List<Cliente>();
+    public List<Articulo> articulos { get; set; } = new List<Articulo>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        int idempleado = 1;
+        empleado = await Http.GetFromJsonAsync<Empleado>("api/empleados/" + idempleado); //traigo empleado seleccionado
+        venta = await Http.GetFromJsonAsync<Venta>($"api/ventas/{idventa}"); //traigo id del parametro
+        clientes = await Http.GetFromJsonAsync<List<Cliente>>("api/clientes"); //muestro todos los clientes
+        articulos = await Http.GetFromJsonAsync<List<Articulo>>("api/articulos"); //muestro todos los articulos
+    }
+
+    async Task EditVenta()
+    {
+        string mensajeconfirma = $"TOTAL = ${venta.Total} ¿Editar venta?";
+        if (await JS.InvokeAsync<bool>("confirm", mensajeconfirma))
+        {
+            var respuesta = await Http.PutAsJsonAsync("api/ventas", venta);
+            var cuerporespuest = await respuesta.Content.ReadAsStringAsync();
+
+            if (respuesta.IsSuccessStatusCode)
+            {
+                NavigationManager.NavigateTo("/lista-ventas");
+            }
+        }
+    }
+}

@@ -1,0 +1,204 @@
+﻿@page "/lista-articulos"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@using System.Text.Json
+@using Proyecto_Vivero.Shared
+
+<div class="d-flex position-sticky justify-content-between m-1">
+    <div class="btn-group mr-2">
+        <button @onclick="CrearArticulo" class="btn btn-success"><i class="oi oi-plus"></i> Add articulo</button>
+    </div>
+    <div class="input-group" style="width:60%">
+        <input class="form-control" type="text" placeholder="Nombre artículo" @bind="NombreArtFiltro" />
+        <input class="form-control" type="text" placeholder="Categoria artículo" @bind="CategoriaArtFiltro" />
+        <div class="input-group-append">
+            <button @onclick="Filtrar" class="btn btn-primary" type="button"><i class="oi oi-magnifying-glass"></i></button>
+            <button @onclick="Limpiar" class="btn btn-danger" type="button"><i class="oi oi-delete"></i></button>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between">
+    <div class="form-inline m-1">
+        <button @onclick="MostrarTodos" style="background:none; border: none">
+            <b>Ver todos</b>
+        </button>
+        <button @onclick="MostrarStockBajo" style="background:none; border: none">
+            <b>Sólo con bajo stock</b>
+        </button>
+    </div>
+
+    <div class="m-1">
+        <button @onclick="CambiarVista" style="background:none; border: none">
+            <b>Cambiar vista</b>
+        </button>
+    </div>
+</div>
+
+@if (articulo == null)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height:24rem">
+        <div class="spinner-grow text-success" role="status">
+            <span class="sr-only">Cargando...</span>
+        </div>
+    </div>
+}
+else if (articulo.Count == 0)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height:24rem">
+        <text>No se encontraron artículos.</text>
+    </div>
+}
+else
+{
+    <div class="card-columns" hidden="@card">
+        <Virtualize Items="@articulo" Context="articulo">
+            <a href="/editar-articulo/@articulo.Id" style="color: inherit">
+                <div class="card text-right" style="background-color:lightgoldenrodyellow; border-radius:6px;">
+                    @if (articulo.Url_Imagen == null || articulo.Url_Imagen == "")
+                    {
+                        <img class="card-img-top" src="noimage.png" alt="Card image cap">
+                    }
+                    else
+                    {
+                        <img class="card-img-top" src="@articulo.Url_Imagen" alt="Card image cap">
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <b>@articulo.Nombre</b>
+                        </h5>
+                        <p class="card-subtitle">
+                            @articulo.Categoria
+                        </p>
+                        <p class="card-text">
+                            PRECIO: <b>$@articulo.PrecioUnitario</b>
+                            <br />
+                            @if (articulo.StockActual < articulo.StockMinimo)
+                            {
+                                <b style="color:darkred">STOCK BAJO: @articulo.StockActual</b>
+                            }
+                            else if (articulo.StockActual > articulo.StockMaximo)
+                            {
+                                <b style="color:darkorange">STOCK EXCEDIDO: @articulo.StockActual</b>
+                            }
+                            else
+                            {
+                                <b style="color:green">STOCK: @articulo.StockActual</b>
+                            }
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </Virtualize>
+    </div>
+
+    <table class="table table-hover" hidden="@lista">
+        <thead class="thead-dark">
+            <tr>
+                <th></th>
+                <th>Imagen</th>
+                <th>Nombre</th>
+                <th>Categoria</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Ultima modif.</th>
+                <th>Stock</th>
+            </tr>
+        </thead>
+        <tbody>
+            <Virtualize Items="@articulo" Context="articulo">
+                <tr @key="articulo.Id">
+                    <td><a href="/editar-articulo/@articulo.Id" style="color:white" class="btn btn-sm btn-primary">Ver</a></td>
+                    <td><img src="@articulo.Url_Imagen" width="75px" height="75px" /></td>
+                    <td><b>@articulo.Nombre</b></td>
+                    <td>@articulo.Categoria</td>
+                    <td>@articulo.Descripcion</td>
+                    <td><b>$@articulo.PrecioUnitario</b></td>
+                    <td>@articulo.Ultima_Modificación</td>
+
+                    @if (articulo.StockActual < articulo.StockMinimo)
+                    {
+                        <td style="color:red;">
+                            <b>@articulo.StockActual ↓</b>
+                        </td>
+                    }
+                    else if (articulo.StockActual > articulo.StockMaximo)
+                    {
+                        <td style="color:orange;">
+                            <b>@articulo.StockActual ↑</b>
+                        </td>
+                    }
+                    else
+                    {
+                        <td style="color:green;">
+                            <b>@articulo.StockActual</b>
+                        </td>
+                    }
+                </tr>
+            </Virtualize>
+        </tbody>
+    </table>
+}
+@code {
+    public List<Articulo> articulo { get; set; } //muestra todos los articulos
+
+    private string NombreArtFiltro = String.Empty; //filtros
+    private string CategoriaArtFiltro = String.Empty;
+
+    protected bool lista = true;
+    protected bool card = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarArticulos();
+    }
+
+    async Task CargarArticulos()
+    {
+        var httpResponse = await Http.GetAsync($"api/articulos/filtro?nombre={NombreArtFiltro}&categoria={CategoriaArtFiltro}");
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            var responseString = await httpResponse.Content.ReadAsStringAsync();
+            articulo = JsonSerializer.Deserialize<List<Articulo>>(responseString,
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        }
+        else
+        {
+            Console.WriteLine("error");
+        }
+    }
+
+    void CambiarVista()
+    {
+        lista = !lista;
+        card = !card;
+    }
+
+    void MostrarStockBajo()
+    {
+        articulo = articulo.Where(x => x.StockActual < x.StockMinimo).ToList();
+    }
+
+    async Task MostrarTodos()
+    {
+        await CargarArticulos();
+    }
+
+    void CrearArticulo()
+    {
+        NavigationManager.NavigateTo("crear-articulo");
+    }
+
+    private async Task Filtrar()
+    {
+        await CargarArticulos();
+    }
+
+    private async Task Limpiar()
+    {
+        NombreArtFiltro = string.Empty;
+        CategoriaArtFiltro = string.Empty;
+        await CargarArticulos();
+    }
+}

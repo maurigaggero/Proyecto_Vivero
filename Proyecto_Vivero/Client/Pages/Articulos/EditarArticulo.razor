@@ -1,0 +1,68 @@
+﻿@page "/editar-articulo/{idarticulo:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+@using Proyecto_Vivero.Shared
+
+<div class="d-flex justify-content-between m-2">
+    <h2><b>Editar articulo</b></h2>
+    <button @onclick="@(() => BorrarArticulo(articulo.Id))" class="btn btn-danger">
+        <i class="oi oi-trash"></i> Eliminar artículo
+    </button>
+</div>
+
+<ComponenteFormArticulo TextBotonSubmit=" Editar articulo" OnValidSubmit="@EditarArtic"
+                        articulo="@articulo" />
+
+@code {
+    Articulo articulo = new Articulo();
+    [Parameter] public int idarticulo { get; set; }
+
+    protected async override Task OnParametersSetAsync()
+    {
+        articulo = await Http.GetFromJsonAsync<Articulo>($"/api/articulos/{idarticulo}");
+    }
+
+    async Task EditarArtic()
+    {
+        var confirmacion = await JS.InvokeAsync<bool>("confirmar", "Editar",
+            $"¿Desea editar {articulo.Nombre}?", "question");
+        if (confirmacion)
+        {
+            var respuesta = await Http.PutAsJsonAsync("/api/articulos", articulo);
+
+            if (respuesta.IsSuccessStatusCode)
+            {
+                await JS.InvokeVoidAsync("simple", "¡Éxito!", "Artículo editado", "success");
+                NavigationManager.NavigateTo("/lista-articulos");
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("simple", "Error",
+                    "No se pudo editar artículo", "error");
+            }
+        }
+    }
+
+    async Task BorrarArticulo(int idarticulo)
+    {
+        var confirmacion = await JS.InvokeAsync<bool>("confirmar", "Eliminar",
+            $"¿Desea eliminar {articulo.Nombre}?", "warning");
+        if (confirmacion)
+        {
+            var respuesta = await Http.DeleteAsync($"/api/articulos/{idarticulo}");
+
+            if (respuesta.IsSuccessStatusCode)
+            {
+                await JS.InvokeVoidAsync("simple", "¡Éxito!", "Artículo eliminado", "success");
+                NavigationManager.NavigateTo("/lista-articulos");
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("simple", "Error",
+                    "No se pudo eliminar artículo", "error");
+            }
+        }
+    }
+}

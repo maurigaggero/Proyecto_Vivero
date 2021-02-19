@@ -1,0 +1,120 @@
+﻿@page "/lista-ventas"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@using System.Text.Json
+@using Proyecto_Vivero.Shared
+
+<div class="d-flex position-sticky justify-content-between m-1">
+    <div class="btn-group mr-2">
+        <button @onclick="CrearVenta" class="btn btn-success"><i class="oi oi-plus"></i> Nueva venta</button>
+    </div>
+    <div class="input-group" style="width:60%">
+        <input class="form-control" type="date" placeholder="Fecha venta" @bind="FechaFiltro" />
+        <input class="form-control" type="text" placeholder="Nombre cliente" @bind="ClienteFiltro" />
+        <input class="form-control" type="text" placeholder="Nombre empleado" @bind="EmpleadoFiltro" />
+        <div class="input-group-append">
+            <button @onclick="Filtrar" class="btn btn-primary" type="button"><i class="oi oi-magnifying-glass"></i></button>
+            <button @onclick="Limpiar" class="btn btn-danger" type="button"><i class="oi oi-delete"></i></button>
+        </div>
+    </div>
+</div>
+
+@if (ventas == null)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height:24rem">
+        <div class="spinner-grow text-success" role="status">
+            <span class="sr-only">Cargando...</span>
+        </div>
+    </div>
+}
+else if (ventas.Count == 0)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height:24rem">
+        <text>No se encontraron ventas.</text>
+    </div>
+}
+else
+{
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th></th>
+                <th>#</th>
+                <th>Fecha</th>
+                <th>Forma de pago</th>
+                <th>Cliente</th>
+                <th>Empleado</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <Virtualize Items="@ventas" Context="venta">
+                <tr @key="venta.Id">
+                    <td><a href="ver-venta/@venta.Id" class="btn btn-sm btn-primary" data-toggle="tooltip" title="Ver venta Id: @venta.Id"><i class="oi oi-eye"></i> Ver</a></td>
+                    <td>@venta.Id</td>
+                    <td>@venta.Fecha</td>
+                    <td>@venta.FormaPago</td>
+                    @if (venta.ClienteId != null)
+                    {
+                        <td><b>@venta.Cliente.NombreyApellido</b></td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+                    <td>@venta.Empleado.NombreyApellido</td>
+                    <td><b>$@venta.Total</b></td>
+                </tr>
+            </Virtualize>
+        </tbody>
+    </table>
+}
+@code {
+    public List<Venta> ventas { get; set; }
+
+    private DateTime FechaFiltro = DateTime.Today.AddDays(+1);
+
+    private string ClienteFiltro = String.Empty;
+    private string EmpleadoFiltro = String.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarVentas();
+    }
+
+    async Task CargarVentas()
+    {
+        string fecha = Convert.ToString(FechaFiltro);
+
+        var httpResponse = await Http.GetAsync($"api/ventas/filtro?cliente={ClienteFiltro}&empleado={EmpleadoFiltro}&fecha={fecha}");
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            var responseString = await httpResponse.Content.ReadAsStringAsync();
+            ventas = JsonSerializer.Deserialize<List<Venta>>(responseString,
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        }
+        else
+        {
+            Console.WriteLine("error");
+        }
+    }
+
+    void CrearVenta()
+    {
+        NavigationManager.NavigateTo("crear-venta");
+    }
+
+    private async Task Filtrar()
+    {
+        await CargarVentas();
+    }
+
+    private async Task Limpiar()
+    {
+        ClienteFiltro = string.Empty;
+        EmpleadoFiltro = string.Empty;
+        FechaFiltro = DateTime.Today.AddDays(+1);
+        await CargarVentas();
+    }
+}

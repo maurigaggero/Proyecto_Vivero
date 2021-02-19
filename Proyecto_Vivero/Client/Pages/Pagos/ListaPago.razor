@@ -1,0 +1,107 @@
+﻿@page "/lista-pagos"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@using System.Text.Json
+@using Proyecto_Vivero.Shared
+
+<div class="d-flex position-sticky justify-content-between m-1">
+    <div class="btn-group mr-2">
+        <button @onclick="CrearPago" class="btn btn-success"><i class="oi oi-plus"></i> Nuevo pago</button>
+    </div>
+    <div class="input-group" style="width:60%">
+        <input class="form-control" type="date" placeholder="Fecha Venta" @bind="FechaFiltro" />
+        <div class="input-group-append">
+            <button @onclick="Filtrar" class="btn btn-primary" type="button"><i class="oi oi-magnifying-glass"></i></button>
+            <button @onclick="Limpiar" class="btn btn-danger" type="button"><i class="oi oi-delete"></i></button>
+        </div>
+    </div>
+</div>
+
+@if (pagos == null)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height:24rem">
+        <div class="spinner-grow text-success" role="status">
+            <span class="sr-only">Cargando...</span>
+        </div>
+    </div>
+}
+else if (pagos.Count == 0)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height:24rem">
+        <text>No se encontraron pagos.</text>
+    </div>
+}
+else
+{
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th></th>
+                <th>#</th>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Empleado</th>
+                <th>Importe</th>
+            </tr>
+        </thead>
+        <tbody>
+            <Virtualize Items="@pagos" Context="pago">
+                <tr @key="pago.Id">
+                    <td><a href="ver-pago/@pago.Id" class="btn btn-sm btn-primary" data-toggle="tooltip" title="Ver pago Id: @pago.Id"><i class="oi oi-eye"></i> Ver</a></td>
+                    <td>@pago.Id</td>
+                    <td>@pago.Fecha</td>
+                    <td><b>@pago.Cliente.NombreyApellido</b></td>
+                    <td>@pago.Empleado.NombreyApellido</td>
+                    <td><b>$@pago.Importe</b></td>
+                </tr>
+            </Virtualize>
+        </tbody>
+    </table>
+}
+@code {
+    public List<Pago> pagos { get; set; }
+
+    private DateTime FechaFiltro = DateTime.Today.AddDays(+1);
+
+    private string ClienteFiltro = String.Empty;
+    private string EmpleadoFiltro = String.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarPagos();
+    }
+
+    async Task CargarPagos()
+    {
+        string fecha = Convert.ToString(FechaFiltro);
+
+        var httpResponse = await Http.GetAsync($"api/pagos/filtro?fecha={fecha}");
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            var responseString = await httpResponse.Content.ReadAsStringAsync();
+            pagos = JsonSerializer.Deserialize<List<Pago>>(responseString,
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        }
+        else
+        {
+            Console.WriteLine("error");
+        }
+    }
+
+    void CrearPago()
+    {
+        NavigationManager.NavigateTo("crear-pago");
+    }
+
+    private async Task Filtrar()
+    {
+        await CargarPagos();
+    }
+
+    private async Task Limpiar()
+    {
+        FechaFiltro = DateTime.Today.AddDays(+1);
+        await CargarPagos();
+    }
+}

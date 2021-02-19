@@ -1,0 +1,43 @@
+﻿@page "/crear-pedido"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+@using Proyecto_Vivero.Shared
+
+<h2><b>Nuevo pedido</b></h2>
+
+<ComponenteFormPedidos textSubmit=" Guardar Pedido" OnValidSubmit="NuevoPedido" 
+          pedido="pedido" clientes="clientes" articulos="articulos"></ComponenteFormPedidos>
+
+@code {
+    public Pedido pedido = new Pedido();
+    public List<Cliente> clientes { get; set; } = new List<Cliente>();
+    public List<Articulo> articulos { get; set; } = new List<Articulo>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        clientes = await Http.GetFromJsonAsync<List<Cliente>>("api/clientes"); //muestro todos los clientes
+        articulos = await Http.GetFromJsonAsync<List<Articulo>>("api/articulos"); //muestro todos los articulos
+    }
+
+    async Task NuevoPedido()
+    {
+        var confirmacion = await JS.InvokeAsync<bool>("confirmar", "¿Finalizar pedido?",
+            $"Seña: ${pedido.Seña}", "question");
+        if (confirmacion)
+        {
+            var respuesta = await Http.PostAsJsonAsync("api/pedidos", pedido);
+
+            if (respuesta.IsSuccessStatusCode)
+            {
+                await JS.InvokeVoidAsync("simple", "¡Éxito!", "Pedido finalizado", "success");
+                NavigationManager.NavigateTo("/lista-pedidos");
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("simple", "Error", "No se pudo realizar pedido", "error");
+            }
+        }
+    }
+}

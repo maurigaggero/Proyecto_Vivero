@@ -1,0 +1,128 @@
+﻿@page "/ver-venta/{idventa:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+@using Proyecto_Vivero.Shared
+
+<div class="d-flex justify-content-between m-2">
+    <div class="btn-group">
+        <button class="btn btn-sm btn-secondary" @onclick="@Volver">
+            Volver atrás
+        </button>
+        <button class="btn btn-sm btn-primary" onclick="window.print()">
+            Imprimir
+        </button>
+    </div>
+    <div class="btn-group">
+        <button @onclick="@(() => BorrarVenta(venta.Id))" class="btn btn-sm btn-danger">
+            <i class="oi oi-trash"></i>Eliminar venta
+        </button>
+    </div>
+</div>
+
+@if (venta != null)
+{
+    <div class="card m-2" style="border-color:grey; border-style:dotted">
+        <div class="card-body">
+            <h4 class="card-title d-flex justify-content-center">
+                <b>FACTURA</b>
+            </h4>
+
+            <div class="d-flex justify-content-between">
+                <b>VIVERO BRITH</b>
+                <text><b>N° COMPROBANTE:</b> @venta.Id</text>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <text>Tienda de vivero y jardineria</text>
+                <text><b>FECHA:</b> @venta.Fecha</text>
+            </div>
+            <div class="d-flex justify-content-between">
+                <text>H. Irigoyen esq. Córdoba, Río Segundo</text>
+                <text><b>FORMA DE PAGO:</b> @venta.FormaPago</text>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <text>3572550166</text>
+                <text><b>EMPLEADO:</b> @venta.Empleado.NombreyApellido</text>
+            </div>
+
+            @if (venta.ClienteId != null)
+            {
+                <hr />
+                <div class="text-left">
+                    <text><b>CLIENTE:</b> @venta.Cliente.NombreyApellido</text> <br />
+                    <text><b>DIRECCIÓN:</b> @venta.Cliente.Dirección</text> <br />
+                    <text><b>TELÉFONO:</b> @venta.Cliente.Teléfono</text>
+                </div>
+            }
+            <hr />
+
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>DESCRIPCIÓN</th>
+                        <th>PRECIO X UN.</th>
+                        <th>CANTIDAD</th>
+                        <th>DESCUENTO</th>
+                        <th>SUBTOTAL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in venta.DetalleVentas)
+                    {
+                        <tr>
+                            <td>@item.Articulo.Nombre</td>
+                            <td>@item.Articulo.PrecioUnitario</td>
+                            <td>@item.Cantidad</td>
+                            <td>@item.Descuento%</td>
+                            <td>@item.SubTotal</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <p class="card-text text-right m-4">
+                <h5><b>TOTAL</b></h5>
+                <h4><b>$@venta.Total</b></h4>
+            </p>
+        </div>
+    </div>
+}
+
+@code {
+    public Venta venta { get; set; }
+
+    [Parameter] public int idventa { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        venta = await Http.GetFromJsonAsync<Venta>($"api/ventas/{idventa}");
+    }
+
+    async Task BorrarVenta(int idventa)
+    {
+        var confirmacion = await JS.InvokeAsync<bool>("confirmar", "¿Eliminar venta?",
+            $"Venta N° {venta.Id}. Fecha: {venta.Fecha}. Total: {venta.Total}", "warning");
+        if (confirmacion)
+        {
+            var respuesta = await Http.DeleteAsync($"/api/ventas/{idventa}");
+
+            if (respuesta.IsSuccessStatusCode)
+            {
+                await JS.InvokeVoidAsync("simple", "¡Exito!", "Venta eliminada", "success");
+                NavigationManager.NavigateTo("lista-ventas");
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("simple", "Error", "No se pudo eliminar venta", "error");
+            }
+        }
+    }
+
+    void Volver()
+    {
+        NavigationManager.NavigateTo("lista-ventas");
+    }
+}

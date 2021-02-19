@@ -1,0 +1,30 @@
+﻿@page "/crear-articulo"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+@using Proyecto_Vivero.Shared
+
+<h2><b>Nuevo artículo</b></h2>
+
+<ComponenteFormArticulo TextBotonSubmit=" Agregar Articulo" ImgBotonSubmit="oi oi-check" OnValidSubmit="@CrearArtic" articulo="@articulo" />
+
+@code {
+    Articulo articulo = new Articulo();
+
+    async Task CrearArtic()
+    {
+        var respuesta = await Http.PostAsJsonAsync("/api/articulos", articulo);
+
+        if (respuesta.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("simple", "¡Éxito!", "Artículo creado", "success");
+            NavigationManager.NavigateTo("/lista-articulos");
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("simple", "Error",
+                    "No se pudo crear artículo", "error");
+        }
+    }
+}

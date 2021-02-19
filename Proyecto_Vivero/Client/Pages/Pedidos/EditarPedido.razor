@@ -1,0 +1,47 @@
+﻿@page "/editar-pedido/{idpedido:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+@using Proyecto_Vivero.Shared
+
+<h2><b>Editar pedido</b></h2>
+
+<ComponenteFormPedidos textSubmit=" Guardar Pedido" OnValidSubmit="EditPedido"
+            pedido="pedido" clientes="clientes" articulos="articulos"></ComponenteFormPedidos>
+
+@code {
+    public Pedido pedido = new Pedido();
+    public List<Cliente> clientes { get; set; } = new List<Cliente>();
+    public List<Articulo> articulos { get; set; } = new List<Articulo>();
+    [Parameter] public int idpedido { get; set; } //parametro id pedido
+
+    protected override async Task OnInitializedAsync()
+    {
+        pedido = await Http.GetFromJsonAsync<Pedido>($"api/pedidos/{idpedido}"); //traigo id del parametro
+        clientes = await Http.GetFromJsonAsync<List<Cliente>>("api/clientes"); //muestro todos los clientes
+        articulos = await Http.GetFromJsonAsync<List<Articulo>>("api/articulos"); //muestro todos los articulos
+    }
+
+    async Task EditPedido()
+    {
+        var confirmacion = await JS.InvokeAsync<bool>("confirmar", "¿Editar pedido?",
+            $"Pedido N° {pedido.Id}. Fecha: {pedido.Fecha} Seña: ${pedido.Seña}", "question");
+        if (confirmacion)
+        {
+            var respuesta = await Http.PutAsJsonAsync("api/pedidos", pedido);
+
+            if (respuesta.IsSuccessStatusCode)
+            {
+                await JS.InvokeVoidAsync("simple", "¡Éxito!",
+                    "Pedido editado", "success");
+                NavigationManager.NavigateTo("/lista-pedidos");
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("simple", "Error",
+                    $"No se pudo editar pedido", "error");
+            }
+        }
+    }
+}

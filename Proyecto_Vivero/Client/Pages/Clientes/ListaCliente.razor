@@ -1,0 +1,187 @@
+﻿@page "/lista-clientes"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@using System.Text.Json
+@using Proyecto_Vivero.Shared
+
+<div class="d-flex position-sticky justify-content-between m-1">
+    <div class="btn-group mr-2">
+        <button @onclick="CrearCliente" class="btn btn-success"><i class="oi oi-plus"></i> Agregar cliente</button>
+    </div>
+    <div class="input-group" style="width:60%">
+        <input class="form-control" type="text" placeholder="Nombre del cliente" @bind="NombreFiltro" />
+        <div class="input-group-append">
+            <button @onclick="Filtrar" class="btn btn-primary" type="button"><i class="oi oi-magnifying-glass"></i></button>
+            <button @onclick="Limpiar" class="btn btn-danger" type="button"><i class="oi oi-delete"></i></button>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between">
+    <div class="form-inline m-1">
+        <button @onclick="MostrarTodos" style="background:none; border: none">
+            <b>Ver todos</b>
+        </button>
+        <button @onclick="MostrarDeudores" style="background:none; border: none">
+            <b>Sólo deudores</b>
+        </button>
+    </div>
+
+    <div class="m-1">
+        <button @onclick="CambiarVista" style="background:none; border: none">
+            <b>Cambiar vista</b>
+        </button>
+    </div>
+</div>
+
+@if (clientes == null)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height:24rem">
+        <div class="spinner-grow text-success" role="status">
+            <span class="sr-only">Cargando...</span>
+        </div>
+    </div>
+}
+else if (clientes.Count == 0)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height:24rem">
+        <text>No se encontraron clientes.</text>
+    </div>
+}
+else
+{
+    <div class="card-columns" hidden="@card">
+        <Virtualize Items="@clientes" Context="cliente">
+            <a href="/editar-cliente/@cliente.Id" style="color: inherit">
+                <div class="card" style="background-color:lightblue; border-style:groove; border-radius:12px;">
+                    @if (cliente.Sexo == Cliente.Sexos.Masculino)
+                    {
+                        <img class="card-img-top" src="masculino.png" alt="Cliente" />
+                    }
+                    else if (cliente.Sexo == Cliente.Sexos.Femenino)
+                    {
+                        <img class="card-img-top" src="femenino.png" alt="Cliente" />
+                    }
+                    else
+                    {
+                        <img class="card-img-top" src="indefinido.png" alt="Cliente" />
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <b>@cliente.NombreyApellido</b>
+                        </h5>
+                        <p class="card-text">
+                            DNI: @cliente.Dni
+                            <br /> @cliente.Dirección - (@cliente.Teléfono)
+                        </p>
+                        <h5 class="card-text text-right">
+                            <b>DEUDA: $@cliente.Saldo</b>
+                        </h5>
+                    </div>
+                </div>
+            </a>
+        </Virtualize>
+    </div>
+
+    <table class="table table-hover" hidden="@lista">
+        <thead class="thead-dark">
+            <tr>
+                <th></th>
+                <th>Nombre y Apellido</th>
+                <th>Dni</th>
+                <th>Sexo</th>
+                <th>Dirección</th>
+                <th>Teléfono</th>
+                <th>Saldo</th>
+            </tr>
+        </thead>
+        <tbody>
+            <Virtualize Items="@clientes" Context="cliente">
+                <tr @key="cliente.Id">
+                    <td><a href="/editar-cliente/@cliente.Id" style="color:white" class="btn btn-sm btn-primary"><i class="oi oi-eye"></i> Ver</a></td>
+                    <td><b>@cliente.NombreyApellido</b></td>
+                    <td>@cliente.Dni</td>
+                    <td>@cliente.Sexo</td>
+                    <td>@cliente.Dirección</td>
+                    <td>@cliente.Teléfono</td>
+
+                    @if (cliente.Saldo > limitedeuda)
+                    {
+                        <td style="color:darkred;">
+                            <b>$@cliente.Saldo</b>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            $@cliente.Saldo
+                        </td>
+                    }
+                </tr>
+            </Virtualize>
+        </tbody>
+    </table>
+}
+@code {
+    public List<Cliente> clientes { get; set; } //muestra todos los clientes
+
+    private string NombreFiltro = String.Empty; //filtros
+
+    protected bool lista = true;
+    protected bool card = false;
+
+    public int limitedeuda = 1000;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarClientes();
+    }
+
+    async Task CargarClientes()
+    {
+        var httpResponse = await Http.GetAsync($"api/clientes/filtro?nombre={NombreFiltro}");
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            var responseString = await httpResponse.Content.ReadAsStringAsync();
+            clientes = JsonSerializer.Deserialize<List<Cliente>>(responseString,
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        }
+        else
+        {
+            Console.WriteLine("error");
+        }
+    }
+
+    void CrearCliente()
+    {
+        NavigationManager.NavigateTo("crear-cliente");
+    }
+
+    void CambiarVista()
+    {
+        lista = !lista;
+        card = !card;
+    }
+
+    private async Task Filtrar()
+    {
+        await CargarClientes();
+    }
+
+    private async Task Limpiar()
+    {
+        NombreFiltro = string.Empty;
+        await CargarClientes();
+    }
+
+    void MostrarDeudores()
+    {
+        clientes = clientes.Where(x => x.Saldo > limitedeuda).OrderByDescending(x => x.Saldo).ToList();
+    }
+
+    async Task MostrarTodos()
+    {
+        await CargarClientes();
+    }
+}

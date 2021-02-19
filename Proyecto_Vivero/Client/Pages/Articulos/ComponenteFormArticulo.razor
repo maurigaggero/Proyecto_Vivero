@@ -1,0 +1,172 @@
+﻿@using Proyecto_Vivero.Shared
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+
+<EditForm Model="@articulo" OnValidSubmit="@OnValidSubmit">
+    <div class="form-field m-2">
+        <div class="row">
+            <div class="col-6">
+                <div class="d-flex justify-content-center m-2">
+                    <img src="@articulo.Url_Imagen" alt="Imagen artículo"
+                         style="border-radius:0.5rem; width:110px; height:105px">
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-4 col-form-label">Nombre</label>
+                    <div class="col">
+                        <div class="input-group">
+                            <InputText @bind-Value="@articulo.Nombre" oninput="this.value=this.value.toUpperCase()" class="form-control" />
+                        </div>
+                        <ValidationMessage For="@(() => articulo.Nombre)" />
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-4 col-form-label">Categoría</label>
+                    <div class="col">
+                        <div class="input-group">
+                            <InputSelect @bind-Value="articulo.Categoria" class="custom-select" name="categoria">
+                                <option selected value="">Seleccione una categoría</option>
+                                <option value="PLANTA DE ADENTRO"> Planta Adentro</option>
+                                <option value="PLANTA DE AFUERA"> Planta Afuera</option>
+                                <option value="MACETA"> Maceta</option>
+                                <option value="FERTILIZANTE"> Fertilizante</option>
+                                <option value="SEMILLA"> Semilla</option>
+                                <option value="TIERRA"> Tierra</option>
+                                <option value="PIE NORDICO"> Pie Nóridco</option>
+                                <option value="OTRA"> Otra</option>
+                            </InputSelect>
+                        </div>
+                        <ValidationMessage For="@(() => articulo.Categoria)" />
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-4 col-form-label">Descripción</label>
+                    <div class="col">
+                        <div class="input-group">
+                            <InputText @bind-Value="@articulo.Descripcion" oninput="this.value=this.value.toUpperCase()" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-4 col-form-label">Url Imagen</label>
+                    <div class="col">
+                        <div class="input-group">
+                            <InputText @bind-Value="@articulo.Url_Imagen" class="form-control" />
+                            <div class="input-group-prepend">
+                                <button @onclick="@(() => articulo.Url_Imagen = null)" class="btn btn-secondary" type="button">
+                                    <i class="oi oi-delete"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="form-group row">
+                    <label class="col-4 col-form-label">Precio mayorista</label>
+                    <div class="col">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-default">$</span>
+                            </div>
+                            <InputNumber @bind-Value="@articulo.PrecioMayorista" class="form-control" step="0.01" />
+                        </div>
+                        <ValidationMessage For="@(() => articulo.PrecioMayorista)" />
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-4 col-form-label">Porcentaje</label>
+                    <div class="col">
+                        <div class="input-group">
+                            <InputNumber @bind-Value="@porcentaje" class="form-control" />
+                            <div class="input-group-append">
+                                <span class="input-group-text">%</span>
+                                <button @onclick="@CalcularUnitario" class="btn btn-secondary" type="button">
+                                    <text>Calcular</text>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-4 col-form-label">Precio unitario</label>
+                    <div class="col">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-default">$</span>
+                            </div>
+                            <InputNumber @bind-Value="@articulo.PrecioUnitario" class="form-control" step="0.01" />
+                        </div>
+                        <ValidationMessage For="@(() => articulo.PrecioUnitario)" />
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-4 col-form-label">Stock actual</label>
+                    <div class="col">
+                        <div class="input-group">
+                            <InputNumber @bind-Value="@articulo.StockActual" min="0" class="form-control" type="number" />
+                        </div>
+                        <ValidationMessage For="@(() => articulo.StockActual)" />
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-4 col-form-label">Stock mínimo</label>
+                    <div class="col">
+                        <div class="input-group">
+                            <InputNumber @bind-Value="@articulo.StockMinimo" min="0" class="form-control" type="number" />
+                        </div>
+                        <ValidationMessage For="@(() => articulo.StockMinimo)" />
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-4 col-form-label">Stock máximo</label>
+                    <div class="col">
+                        <div class="input-group">
+                            <InputNumber @bind-Value="@articulo.StockMaximo" min="0" class="form-control" type="number" />
+                        </div>
+                        <ValidationMessage For="@(() => articulo.StockMaximo)" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center m-2">
+        <div class="btn-group btn-block">
+            <button type="submit" class="btn btn-success">
+                <i class="@ImgBotonSubmit"></i>
+                <text style="color:white">@TextBotonSubmit</text>
+            </button>
+            <button @onclick="@Volver" class="btn btn-secondary"><i class="oi oi-arrow-circle-left"></i><text style="color:white"> Volver atrás</text></button>
+        </div>
+    </div>
+    <DataAnnotationsValidator />
+</EditForm>
+
+@code {
+    [Parameter] public Articulo articulo { get; set; } = new Articulo();
+    [Parameter] public string ImgBotonSubmit { get; set; } = "oi oi-check";
+    [Parameter] public string TextBotonSubmit { get; set; } = "Agregar Articulo";
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+
+    public int porcentaje { get; set; }
+
+    public void CalcularUnitario()
+    {
+        articulo.PrecioUnitario = articulo.CalcularUnitario(articulo.PrecioMayorista, porcentaje);
+    }
+
+    void Volver()
+    {
+        NavigationManager.NavigateTo("/lista-articulos");
+    }
+}
