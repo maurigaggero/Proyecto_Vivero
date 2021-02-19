@@ -1,5 +1,10 @@
 ﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">Proyecto_Vivero</a>
+    <a class="navbar-brand" href="#">
+        <div class="container-fluid">
+            <img src="flow.png" />
+            <b style="color:yellow">Vivero Brith</b>
+        </div>
+    </a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -8,18 +13,38 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+            <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Inicio
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
+            <NavLink class="nav-link" href="lista-ventas" Match="NavLinkMatch.All">
+                <span class="oi oi-cart" aria-hidden="true"></span> Ventas
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+            <NavLink class="nav-link" href="lista-articulos">
+                <span class="oi oi-list" aria-hidden="true"></span> Artículos
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="lista-clientes">
+                <span class="oi oi-people" aria-hidden="true"></span> Clientes
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="lista-pedidos">
+                <span class="oi oi-task" aria-hidden="true"></span> Pedidos
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="lista-pagos">
+                <span class="oi oi-dollar" aria-hidden="true"></span> Pagos
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="cuentas">
+                <span class="oi oi-briefcase" aria-hidden="true"></span> Cuentas Corrientes
             </NavLink>
         </li>
     </ul>
