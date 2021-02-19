@@ -1,5 +1,16 @@
 ﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+/*AGREGADO POR MAURICIO*/
+.table td, th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.card:hover {
+    box-shadow: 0 0 12px rgba(33,33,33,.2);
+}
+/*FIN*/
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
