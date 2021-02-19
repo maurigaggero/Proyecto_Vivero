@@ -16,8 +16,4 @@
     <ProjectReference Include="..\Shared\Proyecto_Vivero.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Pages\Presupuesto\" />
-  </ItemGroup>
-
 </Project>

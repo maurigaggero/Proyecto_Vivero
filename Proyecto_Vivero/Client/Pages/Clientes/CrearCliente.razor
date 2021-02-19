@@ -3,11 +3,15 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize]
+
 @using Proyecto_Vivero.Shared
 
 <h2><b>Nuevo cliente</b></h2>
 
-<ComponenteFormCliente cliente="cliente" TextBotonSubmit=" Agregar Cliente" 
+<ComponenteFormCliente cliente="cliente" TextBotonSubmit=" Agregar Cliente"
                        OnValidSubmit="@CrearClient" />
 
 @code {

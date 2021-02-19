@@ -2,6 +2,10 @@
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize]
+
 @using System.Text.Json
 @using Proyecto_Vivero.Shared
 
@@ -80,7 +84,15 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await CargarVentas();
+        try
+        {
+            await CargarVentas();
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+
     }
 
     async Task CargarVentas()

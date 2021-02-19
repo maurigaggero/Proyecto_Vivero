@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Proyecto_Vivero.Server.Data;
 using Proyecto_Vivero.Shared;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Proyecto_Vivero.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class EstadisticasController : ControllerBase

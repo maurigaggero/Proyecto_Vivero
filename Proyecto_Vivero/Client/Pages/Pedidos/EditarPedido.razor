@@ -3,12 +3,16 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize]
+
 @using Proyecto_Vivero.Shared
 
 <h2><b>Editar pedido</b></h2>
 
 <ComponenteFormPedidos textSubmit=" Guardar Pedido" OnValidSubmit="EditPedido"
-            pedido="pedido" clientes="clientes" articulos="articulos"></ComponenteFormPedidos>
+                       pedido="pedido" clientes="clientes" articulos="articulos"></ComponenteFormPedidos>
 
 @code {
     public Pedido pedido = new Pedido();

@@ -3,6 +3,10 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize]
+
 @using Proyecto_Vivero.Shared
 
 <h2><b>Nuevo pago</b></h2>
@@ -34,12 +38,12 @@
 
             if (respuesta.IsSuccessStatusCode)
             {
-                await JS.InvokeVoidAsync("simple", "¡Éxito!","Pago finalizado", "success");
+                await JS.InvokeVoidAsync("simple", "¡Éxito!", "Pago finalizado", "success");
                 NavigationManager.NavigateTo("/ver-pago/" + cuerporespuest);
             }
             else
             {
-                await JS.InvokeVoidAsync("simple", "Error","No se pudo realizar pago", "error");
+                await JS.InvokeVoidAsync("simple", "Error", "No se pudo realizar pago", "error");
             }
         }
     }
