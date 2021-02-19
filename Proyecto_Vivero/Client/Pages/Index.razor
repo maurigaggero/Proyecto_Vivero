@@ -1,4 +1,7 @@
 ﻿@page "/"
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="alert-light" style="margin:12rem; color:black">
     <div>
@@ -6,7 +9,7 @@
     </div>
     <AuthorizeView>
         <Authorized>
-            <h2>#nombreusuario</h2>
+            <h5>@_authMessage</h5>
         </Authorized>
     </AuthorizeView>
     <AuthorizeView>
@@ -23,4 +26,27 @@
 </div>
 
 @code{
+    private string _authMessage;
+    private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetClaims();
+    }
+
+    private async Task GetClaims()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            _authMessage = $"Autenticado correctamente como {user.Identity.Name} ";
+            _claims = user.Claims;
+        }
+        else
+        {
+            _authMessage = "Usuario no autenticado.";
+        }
+    }
 }
