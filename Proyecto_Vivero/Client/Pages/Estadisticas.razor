@@ -1,0 +1,201 @@
+﻿@page "/estadisticas"
+@inject HttpClient Http
+
+@using Proyecto_Vivero.Shared
+
+<div class="d-flex justify-content-between">
+    <h2><b>Estadísticas</b></h2>
+
+    <div class="input-group ml-2 m-1" style="width:40%">
+        <select @bind="@tiempo" class="form-control">
+            <option value="dia">Día</option>
+            <option value="mes">Mes</option>
+            <option value="año">Año</option>
+        </select>
+        <div class="input-group-append">
+            <button class="btn btn-warning" style="color:white" @onclick="(() => CambioRango(tiempo))">Mostrar</button>
+        </div>
+    </div>
+</div>
+
+@if (ventas == null)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height:24rem">
+        <div class="spinner-grow text-success" role="status">
+            <span class="sr-only">Cargando...</span>
+        </div>
+    </div>
+}
+else if (ventas.Count == 0)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height:24rem">
+        <text>No hay datos cargados.</text>
+    </div>
+}
+else
+{
+    <div class="card-deck mt-3">
+        <div class="card">
+            <a href="/lista-ventas" style="color:inherit; text-decoration:none">
+                <div class="card-body">
+                    <h6 class="card-title">CANTIDAD DE VENTAS</h6>
+                    <div class="m-2">
+                        <div class="d-flex justify-content-between">
+                            <text>@actual</text> <text>@anterior</text>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            @if (cantidadventas.Item1 > cantidadventas.Item2)
+                            {
+                                <h3 style="color:green">@cantidadventas.Item1 ↑</h3> <h3>@cantidadventas.Item2</h3>
+                            }
+                            @if (cantidadventas.Item1 < cantidadventas.Item2)
+                            {
+                                <h3 style="color:darkred">@cantidadventas.Item1 ↓</h3> <h3>@cantidadventas.Item2</h3>
+                            }
+                            @if (cantidadventas.Item1 == cantidadventas.Item2)
+                            {
+                                <h3 style="color:royalblue">@cantidadventas.Item1 =</h3> <h3>@cantidadventas.Item2</h3>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="card">
+            <a href="/lista-ventas" style="color:inherit; text-decoration:none">
+                <div class="card-body">
+                    <h6 class="card-title">TOTAL FACTURADO</h6>
+                    <div class="m-2">
+                        <div class="d-flex justify-content-between">
+                            <text>@actual</text> <text>@anterior</text>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            @if (totalfacturado.Item1 > totalfacturado.Item2)
+                            {
+                                <h3 style="color:green">$@totalfacturado.Item1 ↑</h3> <h3>$@totalfacturado.Item2</h3>
+                            }
+                            @if (totalfacturado.Item1 < totalfacturado.Item2)
+                            {
+                                <h3 style="color:darkred">$@totalfacturado.Item1 ↓</h3> <h3>$@totalfacturado.Item2</h3>
+                            }
+                            @if (totalfacturado.Item1 == totalfacturado.Item2)
+                            {
+                                <h3 style="color:royalblue">$@totalfacturado.Item1 =</h3> <h3>$@totalfacturado.Item2</h3>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="card-deck mt-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">TOTAL INGRESOS</h6>
+                <div class="m-2">
+                    <div class="d-flex justify-content-between">
+                        <text>@actual</text> <text>@anterior</text>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        @if (totalcaja.Item1 > totalcaja.Item2)
+                        {
+                            <h3 style="color:green">$@totalcaja.Item1 ↑</h3> <h3>$@totalcaja.Item2</h3>
+                        }
+                        @if (totalcaja.Item1 < totalcaja.Item2)
+                        {
+                            <h3 style="color:darkred">$@totalcaja.Item1 ↓</h3> <h3>$@totalcaja.Item2</h3>
+                        }
+                        @if (totalcaja.Item1 == totalcaja.Item2)
+                        {
+                            <h3 style="color:royalblue">$@totalcaja.Item1 =</h3> <h3>$@totalcaja.Item2</h3>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <a href="/lista-pedidos" style="color:inherit; text-decoration:none">
+                <div class="card-body">
+                    <h6 class="card-title">PEDIDOS PENDIENTES</h6>
+                    <div class="m-2">
+                        <div class="d-flex justify-content-end">
+                            <text>Total</text>
+                        </div>
+                        @if (pedidospendientes > 0)
+                        {
+                            <div class="d-flex justify-content-between">
+                                <div><h5 class="oi oi-warning" style="color:orange"></h5></div>
+                                <h3>@pedidospendientes</h3>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-flex justify-content-end">
+                                <h3>@pedidospendientes</h3>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+}
+
+
+@code {
+    public Tuple<int, int> cantidadventas { get; set; }
+    public Tuple<decimal, decimal> totalfacturado { get; set; }
+    public Tuple<decimal, decimal> totalcaja { get; set; }
+    public int pedidospendientes { get; set; }
+
+    public string tiempo = "dia";
+
+    public string actual { get; set; } = "Hoy";
+    public string anterior { get; set; } = "Ayer";
+
+    public List<Venta> ventas { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ventas = await Http.GetFromJsonAsync<List<Venta>>($"api/ventas");
+        await CargarEstadisticas("dia");
+    }
+
+    async Task CambioRango(string t)
+    {
+        if (t == "dia")
+        {
+            actual = "Hoy";
+            anterior = "Ayer";
+        }
+
+        if (t == "mes")
+        {
+            actual = "Este mes";
+            anterior = "Mes pasado";
+        }
+
+        if (t == "año")
+        {
+            actual = "Este año";
+            anterior = "Año pasado";
+        }
+
+        await CargarEstadisticas(t);
+    }
+
+    async Task CargarEstadisticas(string t)
+    {
+        cantidadventas = await Http.GetFromJsonAsync<Tuple<int, int>>($"api/estadisticas/cantidad/{t}");
+        totalfacturado = await Http.GetFromJsonAsync<Tuple<decimal, decimal>>($"api/estadisticas/total/{t}");
+        totalcaja = await Http.GetFromJsonAsync<Tuple<decimal, decimal>>($"api/estadisticas/ingresos/{t}");
+
+        pedidospendientes = await Http.GetFromJsonAsync<int>("api/estadisticas/cantpendientes");
+    }
+}
