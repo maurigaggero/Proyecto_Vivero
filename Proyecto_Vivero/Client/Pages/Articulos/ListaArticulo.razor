@@ -56,46 +56,47 @@ else if (articulo.Count == 0)
 }
 else
 {
-    <div class="card-columns" hidden="@card">
-        <Virtualize Items="@articulo" Context="articulo">
-            <a href="/editar-articulo/@articulo.Id" style="color: inherit">
-                <div class="card text-right" style="background-color:lightgoldenrodyellow; border-radius:6px;">
-                    @if (articulo.Url_Imagen == null || articulo.Url_Imagen == "")
-                    {
-                        <img class="card-img-top" src="noimage.png" alt="Card image cap">
-                    }
-                    else
-                    {
-                        <img class="card-img-top" src="@articulo.Url_Imagen" alt="Card image cap">
-                    }
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <b>@articulo.Nombre</b>
-                        </h5>
-                        <p class="card-subtitle">
-                            @articulo.Categoria
-                        </p>
-                        <p class="card-text">
-                            PRECIO: <b>$@articulo.PrecioUnitario</b>
-                            <br />
-                            @if (articulo.StockActual < articulo.StockMinimo)
-                            {
-                                <b style="color:darkred">STOCK BAJO: @articulo.StockActual</b>
-                            }
-                            else if (articulo.StockActual > articulo.StockMaximo)
-                            {
-                                <b style="color:darkorange">STOCK EXCEDIDO: @articulo.StockActual</b>
-                            }
-                            else
-                            {
-                                <b style="color:green">STOCK: @articulo.StockActual</b>
-                            }
-                        </p>
-                    </div>
+<div class="card-columns" hidden="@card">
+    @foreach (var articulo in articulo)
+    {
+        <a href="/editar-articulo/@articulo.Id" style="color: inherit">
+            <div class="card text-right" style="background-color:lightgoldenrodyellow; border-radius:6px;">
+                @if (articulo.Url_Imagen == null || articulo.Url_Imagen == "")
+                {
+                    <img class="card-img-top" src="noimage.png" alt="Card image cap">
+                }
+                else
+                {
+                    <img class="card-img-top" src="@articulo.Url_Imagen" alt="Card image cap">
+                }
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <b>@articulo.Nombre</b>
+                    </h5>
+                    <p class="card-subtitle">
+                        @articulo.Categoria
+                    </p>
+                    <p class="card-text">
+                        PRECIO: <b>$@articulo.PrecioUnitario</b>
+                        <br />
+                        @if (articulo.StockActual < articulo.StockMinimo)
+                        {
+                            <b style="color:darkred">STOCK BAJO: @articulo.StockActual</b>
+                        }
+                        else if (articulo.StockActual > articulo.StockMaximo)
+                        {
+                            <b style="color:darkorange">STOCK EXCEDIDO: @articulo.StockActual</b>
+                        }
+                        else
+                        {
+                            <b style="color:green">STOCK: @articulo.StockActual</b>
+                        }
+                    </p>
                 </div>
-            </a>
-        </Virtualize>
-    </div>
+            </div>
+        </a>
+    }
+</div>
 
     <table class="table table-hover" hidden="@lista">
         <thead class="thead-dark">

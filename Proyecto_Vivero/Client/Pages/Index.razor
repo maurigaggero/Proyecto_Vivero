@@ -31,10 +31,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await GetClaims();
+        await GetUserLogin();
     }
 
-    private async Task GetClaims()
+    private async Task GetUserLogin()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;

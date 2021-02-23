@@ -56,7 +56,8 @@ else if (clientes.Count == 0)
 else
 {
     <div class="card-columns" hidden="@card">
-        <Virtualize Items="@clientes" Context="cliente">
+        @foreach (var cliente in clientes)
+        {
             <a href="/editar-cliente/@cliente.Id" style="color: inherit">
                 <div class="card" style="background-color:lightblue; border-style:groove; border-radius:12px;">
                     @if (cliente.Sexo == Cliente.Sexos.Masculino)
@@ -85,7 +86,7 @@ else
                     </div>
                 </div>
             </a>
-        </Virtualize>
+        }
     </div>
 
     <table class="table table-hover" hidden="@lista">
