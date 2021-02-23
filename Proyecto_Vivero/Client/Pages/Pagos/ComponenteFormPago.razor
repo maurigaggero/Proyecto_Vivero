@@ -6,17 +6,6 @@
 <EditForm Model="@pago" OnValidSubmit="OnValidSubmit">
     <div class="form-field m-2">
         <div class="form-group row">
-            <label class="col-3 col-form-label">Empleado</label>
-            <div class="col">
-                <div class="input-group">
-                    <InputNumber @bind-Value="pago.EmpleadoId" class="form-control" hidden />
-                    <InputText @bind-Value="empleado.NombreyApellido" class="form-control-plaintext" readonly />
-                </div>
-                <ValidationMessage For="@(() => pago.EmpleadoId)" />
-            </div>
-        </div>
-
-        <div class="form-group row">
             <label class="col-3 col-form-label">Cliente</label>
             <div class="col">
                 <div class="input-group">
@@ -45,6 +34,21 @@
             </div>
         </div>
 
+        <div class="form-group row">
+            <label class="col-3 col-form-label">Forma de Pago</label>
+            <div class="col">
+                <div class="input-group">
+                    <InputSelect @bind-Value="pago.FormaPago" class="form-control">
+                        @foreach (string fpago in Enum.GetNames(typeof(Pago.FormasPago)))
+                        {
+                            <option value="@fpago"> @fpago</option>
+                        }
+                    </InputSelect>
+                </div>
+                <ValidationMessage For="@(() => pago.FormaPago)" />
+            </div>
+        </div>
+
         <div class="form-group">
             <div class="d-flex justify-content-center">
                 <div class="btn-group btn-block">
@@ -60,7 +64,6 @@
 
 @code {
     [Parameter] public Pago pago { get; set; } = new Pago();
-    [Parameter] public Empleado empleado { get; set; } = new Empleado();
     [Parameter] public List<Cliente> clientes { get; set; } = new List<Cliente>();
     [Parameter] public EventCallback OnValidSubmit { get; set; }
 

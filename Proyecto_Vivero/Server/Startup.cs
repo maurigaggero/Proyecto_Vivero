@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Proyecto_Vivero.Server.Data;
-using Proyecto_Vivero.Server.Models;
+using Proyecto_Vivero.Shared;
 using System.Linq;
 
 namespace Proyecto_Vivero.Server

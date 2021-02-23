@@ -5,17 +5,6 @@
 <EditForm Model="@venta" OnValidSubmit="OnValidSubmit">
     <div class="form-field m-2">
         <div class="form-group row">
-            <label class="col-3 col-form-label">Empleado</label>
-            <div class="col">
-                <div class="input-group">
-                    <InputNumber @bind-Value="venta.EmpleadoId" class="form-control" hidden />
-                    <InputText @bind-Value="empleado.NombreyApellido" class="form-control-plaintext" readonly />
-                </div>
-                <ValidationMessage For="@(() => venta.EmpleadoId)" />
-            </div>
-        </div>
-
-        <div class="form-group row">
             <label class="col-3 col-form-label">Forma de Pago</label>
             <div class="col">
                 <div class="input-group">
@@ -162,7 +151,6 @@
 
 @code {
     [Parameter] public Venta venta { get; set; } = new Venta();
-    [Parameter] public Empleado empleado { get; set; } = new Empleado();
     [Parameter] public List<Cliente> clientes { get; set; } = new List<Cliente>();
     [Parameter] public List<Articulo> articulos { get; set; } = new List<Articulo>();
     [Parameter] public EventCallback OnValidSubmit { get; set; }

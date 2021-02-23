@@ -7,6 +7,12 @@ namespace Proyecto_Vivero.Server.Data.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<string>(
+                name: "NombreyApellido",
+                table: "AspNetUsers",
+                type: "nvarchar(max)",
+                nullable: true);
+
             migrationBuilder.CreateTable(
                 name: "Articulos",
                 columns: table => new
@@ -48,18 +54,54 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Empleados",
+                name: "Compras",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    NombreyApellido = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Sexo = table.Column<int>(type: "int", nullable: false),
-                    Dirección = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Teléfono = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Proveedor = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EmpleadoId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Total = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Empleados", x => x.Id);
+                    table.PrimaryKey("PK_Compras", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Compras_AspNetUsers_EmpleadoId",
+                        column: x => x.EmpleadoId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Pagos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ClienteId = table.Column<int>(type: "int", nullable: false),
+                    EmpleadoId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    FormaPago = table.Column<int>(type: "int", nullable: false),
+                    Importe = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Pagos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Pagos_AspNetUsers_EmpleadoId",
+                        column: x => x.EmpleadoId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Pagos_Clientes_ClienteId",
+                        column: x => x.ClienteId,
+                        principalTable: "Clientes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -85,34 +127,6 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Pagos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ClienteId = table.Column<int>(type: "int", nullable: false),
-                    EmpleadoId = table.Column<int>(type: "int", nullable: false),
-                    Importe = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Pagos", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Pagos_Clientes_ClienteId",
-                        column: x => x.ClienteId,
-                        principalTable: "Clientes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Pagos_Empleados_EmpleadoId",
-                        column: x => x.EmpleadoId,
-                        principalTable: "Empleados",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Ventas",
                 columns: table => new
                 {
@@ -121,22 +135,52 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                     Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
                     FormaPago = table.Column<int>(type: "int", nullable: false),
                     ClienteId = table.Column<int>(type: "int", nullable: true),
-                    EmpleadoId = table.Column<int>(type: "int", nullable: false),
+                    EmpleadoId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Total = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Ventas", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Ventas_AspNetUsers_EmpleadoId",
+                        column: x => x.EmpleadoId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Ventas_Clientes_ClienteId",
                         column: x => x.ClienteId,
                         principalTable: "Clientes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DetalleCompras",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ArticuloId = table.Column<int>(type: "int", nullable: false),
+                    Cantidad = table.Column<int>(type: "int", nullable: false),
+                    Precio_Mayorista = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Precio_Unitario = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    SubTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CompraId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DetalleCompras", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Ventas_Empleados_EmpleadoId",
-                        column: x => x.EmpleadoId,
-                        principalTable: "Empleados",
+                        name: "FK_DetalleCompras_Articulos_ArticuloId",
+                        column: x => x.ArticuloId,
+                        principalTable: "Articulos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DetalleCompras_Compras_CompraId",
+                        column: x => x.CompraId,
+                        principalTable: "Compras",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -235,6 +279,11 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Compras_EmpleadoId",
+                table: "Compras",
+                column: "EmpleadoId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CuentasCorrientes_ClienteId",
                 table: "CuentasCorrientes",
                 column: "ClienteId");
@@ -248,6 +297,16 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                 name: "IX_CuentasCorrientes_VentaId",
                 table: "CuentasCorrientes",
                 column: "VentaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DetalleCompras_ArticuloId",
+                table: "DetalleCompras",
+                column: "ArticuloId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DetalleCompras_CompraId",
+                table: "DetalleCompras",
+                column: "CompraId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DetallePedidos_ArticuloId",
@@ -301,6 +360,9 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                 name: "CuentasCorrientes");
 
             migrationBuilder.DropTable(
+                name: "DetalleCompras");
+
+            migrationBuilder.DropTable(
                 name: "DetallePedidos");
 
             migrationBuilder.DropTable(
@@ -308,6 +370,9 @@ namespace Proyecto_Vivero.Server.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Pagos");
+
+            migrationBuilder.DropTable(
+                name: "Compras");
 
             migrationBuilder.DropTable(
                 name: "Pedidos");
@@ -321,8 +386,9 @@ namespace Proyecto_Vivero.Server.Data.Migrations
             migrationBuilder.DropTable(
                 name: "Clientes");
 
-            migrationBuilder.DropTable(
-                name: "Empleados");
+            migrationBuilder.DropColumn(
+                name: "NombreyApellido",
+                table: "AspNetUsers");
         }
     }
 }

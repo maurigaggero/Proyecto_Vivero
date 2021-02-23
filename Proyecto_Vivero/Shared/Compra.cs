@@ -9,20 +9,16 @@ using System.Threading.Tasks;
 
 namespace Proyecto_Vivero.Shared
 {
-    public class Venta
+    public class Compra
     {
         #region ATRIBUTOS/PROPIEDADES
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public DateTime Fecha { get; set; }
-        [Required, EnumDataType(typeof(FormasPago))]
-        public FormasPago FormaPago { get; set; }
-        public List<DetalleVenta> DetalleVentas { get; set; } = new List<DetalleVenta>();
-        [Range(1, 99999999, ErrorMessage = "Seleccione cliente")]
-        public int? ClienteId { get; set; }
-        [ForeignKey("ClienteId")]
-        public Cliente Cliente { get; set; }
+        public List<DetalleCompra> DetalleCompras { get; set; } = new List<DetalleCompra>();
+        [Required]
+        public string Proveedor { get; set; }
         public string EmpleadoId { get; set; }
         [ForeignKey("EmpleadoId")]
         public virtual ApplicationUser ApplicationUser { get; set; }
@@ -30,14 +26,7 @@ namespace Proyecto_Vivero.Shared
         #endregion
     }
 
-    public enum FormasPago
-    {
-        Efectivo = 1,
-        MercadoPago = 2,
-        CuentaCorriente = 3
-    }
-
-    public class DetalleVenta
+    public class DetalleCompra
     {
         #region ATRIBUTOS/PROPIEDADES
         [Key]
@@ -48,21 +37,30 @@ namespace Proyecto_Vivero.Shared
         [ForeignKey("ArticuloId")]
         public Articulo Articulo { get; set; }
         [Required]
+        [Range(1, 99999999, ErrorMessage = "Valor inválido")]
         public int Cantidad { get; set; }
         [Required]
-        public int Descuento { get; set; }
+        public decimal Precio_Mayorista { get; set; }
+        [Required]
+        public decimal Precio_Unitario { get; set; }
         public decimal SubTotal { get; set; }
         [Required]
-        public int VentaId { get; set; }
-        [ForeignKey("VentaId")]
-        public Venta Venta { get; set; }
+        public int CompraId { get; set; }
+        [ForeignKey("CompraId")]
+        public Compra Compra { get; set; }
         #endregion
 
         #region MÉTODOS
-        public decimal CalcularSubTotal(int cantidad, decimal precio, decimal descuento)
+        public decimal CalcularSubTotal(int cantidad, decimal precio)
         {
-            decimal subtotal = ((precio * cantidad) + (precio * cantidad) * - descuento / 100);
+            decimal subtotal = (precio * cantidad);
             return subtotal;
+        }
+
+        public decimal CalcularUnitario(decimal mayorista, int porcentaje)
+        {
+            decimal unitario = ((mayorista) + (porcentaje * mayorista) / 100);
+            return unitario;
         }
         #endregion
     }

@@ -12,18 +12,14 @@
 <h2><b>Nuevo pago</b></h2>
 
 <ComponenteFormPago textSubmit=" Finalizar Pago" OnValidSubmit="CreaPago" pago="pago"
-                    empleado="empleado" clientes="clientes"></ComponenteFormPago>
+                     clientes="clientes"></ComponenteFormPago>
 
 @code {
     public Pago pago = new Pago();
-    public Empleado empleado = new Empleado();
     public List<Cliente> clientes { get; set; } = new List<Cliente>();
 
     protected override async Task OnInitializedAsync()
     {
-        int idempleado = 1;
-        empleado = await Http.GetFromJsonAsync<Empleado>("api/empleados/" + idempleado); //traigo empleado seleccionado
-        pago.EmpleadoId = idempleado;
         clientes = await Http.GetFromJsonAsync<List<Cliente>>("api/clientes"); //muestro todos los clientes
     }
 

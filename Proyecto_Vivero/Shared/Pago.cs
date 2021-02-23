@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -21,12 +22,21 @@ namespace Proyecto_Vivero.Shared
         [ForeignKey("ClienteId")]
         [Range(1, 99999999, ErrorMessage = "Seleccione cliente")]
         public Cliente Cliente { get; set; }
-        [Required]
-        public int EmpleadoId { get; set; }
+        public string EmpleadoId { get; set; }
         [ForeignKey("EmpleadoId")]
-        public Empleado Empleado { get; set; }
+        public virtual ApplicationUser ApplicationUser { get; set; }
+        [Required, EnumDataType(typeof(FormasPago))]
+        public FormasPago FormaPago { get; set; }
         [Required]
         public decimal Importe { get; set; }
+
+        public enum FormasPago
+        {
+            Efectivo = 1,
+            MercadoPago = 2,
+            Cheque = 3,
+            Transferencia = 4
+        }
         #endregion
     }
 }

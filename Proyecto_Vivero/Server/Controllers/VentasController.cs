@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Proyecto_Vivero.Server.Common;
 
 namespace Proyecto_Vivero.Server.Controllers
 {
@@ -28,7 +29,7 @@ namespace Proyecto_Vivero.Server.Controllers
         public async Task<ActionResult<List<Venta>>> Get()
         {
             return await _context.Ventas.Include(x => x.Cliente)
-                .Include(x => x.Empleado)
+                .Include(x => x.ApplicationUser)
                 .Include(x => x.DetalleVentas)
                 .ThenInclude(x => x.Articulo)
                 .ToListAsync();
@@ -41,7 +42,7 @@ namespace Proyecto_Vivero.Server.Controllers
             DateTime f = Convert.ToDateTime(fecha);
 
             var queryable = _context.Ventas.Include(x => x.Cliente)
-                .Include(x => x.Empleado)
+                .Include(x => x.ApplicationUser)
                 .Include(x => x.DetalleVentas)
                 .ThenInclude(x => x.Articulo).AsQueryable();
 
@@ -51,7 +52,7 @@ namespace Proyecto_Vivero.Server.Controllers
             }
             if (!string.IsNullOrEmpty(empleado))
             {
-                queryable = queryable.Where(x => x.Empleado.NombreyApellido.Contains(empleado));
+                queryable = queryable.Where(x => x.ApplicationUser.NombreyApellido.Contains(empleado));
             }
             if (f != DateTime.Today.AddDays(+1))
             {
@@ -68,7 +69,7 @@ namespace Proyecto_Vivero.Server.Controllers
         public async Task<ActionResult<Venta>> Get(int id)
         {
             return await _context.Ventas.Include(x => x.Cliente)
-                .Include(x => x.Empleado)
+                .Include(x => x.ApplicationUser)
                 .Include(x => x.DetalleVentas)
                 .ThenInclude(x => x.Articulo)
                 .FirstAsync(x => x.Id == id);
@@ -78,6 +79,8 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<int>> Post(Venta venta)
         {
+            var userid = User.GetUserId();
+            venta.EmpleadoId = userid;
             _context.Ventas.Add(venta);
             try
             {

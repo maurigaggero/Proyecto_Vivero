@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Proyecto_Vivero.Server.Models;
 using Proyecto_Vivero.Shared;
 using System;
 using System.Collections.Generic;
@@ -19,7 +18,6 @@ namespace Proyecto_Vivero.Server.Data
         {
         }
         public DbSet<Cliente> Clientes { get; set; }
-        public DbSet<Empleado> Empleados { get; set; }
         public DbSet<Articulo> Articulos { get; set; }
         public DbSet<Venta> Ventas { get; set; }
         public DbSet<DetalleVenta> DetalleVentas { get; set; }
@@ -27,5 +25,7 @@ namespace Proyecto_Vivero.Server.Data
         public DbSet<DetallePedido> DetallePedidos { get; set; }
         public DbSet<Pago> Pagos { get; set; }
         public DbSet<CuentaCorriente> CuentasCorrientes { get; set; }
+        public DbSet<Compra> Compras { get; set; }
+        public DbSet<DetalleCompra> DetalleCompras { get; set; }
     }
 }

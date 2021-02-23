@@ -10,7 +10,7 @@ using Proyecto_Vivero.Server.Data;
 namespace Proyecto_Vivero.Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210219181409_new")]
+    [Migration("20210223174455_new")]
     partial class @new
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -259,7 +259,7 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("Proyecto_Vivero.Server.Models.ApplicationUser", b =>
+            modelBuilder.Entity("Proyecto_Vivero.Shared.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -283,6 +283,9 @@ namespace Proyecto_Vivero.Server.Data.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NombreyApellido")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -403,6 +406,33 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                     b.ToTable("Clientes");
                 });
 
+            modelBuilder.Entity("Proyecto_Vivero.Shared.Compra", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("EmpleadoId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Proveedor")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Total")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpleadoId");
+
+                    b.ToTable("Compras");
+                });
+
             modelBuilder.Entity("Proyecto_Vivero.Shared.CuentaCorriente", b =>
                 {
                     b.Property<int>("Id")
@@ -440,6 +470,40 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                     b.HasIndex("VentaId");
 
                     b.ToTable("CuentasCorrientes");
+                });
+
+            modelBuilder.Entity("Proyecto_Vivero.Shared.DetalleCompra", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ArticuloId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CompraId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Precio_Mayorista")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Precio_Unitario")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("SubTotal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArticuloId");
+
+                    b.HasIndex("CompraId");
+
+                    b.ToTable("DetalleCompras");
                 });
 
             modelBuilder.Entity("Proyecto_Vivero.Shared.DetallePedido", b =>
@@ -498,31 +562,6 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                     b.ToTable("DetalleVentas");
                 });
 
-            modelBuilder.Entity("Proyecto_Vivero.Shared.Empleado", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Dirección")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NombreyApellido")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Sexo")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Teléfono")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Empleados");
-                });
-
             modelBuilder.Entity("Proyecto_Vivero.Shared.Pago", b =>
                 {
                     b.Property<int>("Id")
@@ -533,11 +572,14 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                     b.Property<int>("ClienteId")
                         .HasColumnType("int");
 
-                    b.Property<int>("EmpleadoId")
-                        .HasColumnType("int");
+                    b.Property<string>("EmpleadoId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("FormaPago")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Importe")
                         .HasColumnType("decimal(18,2)");
@@ -587,8 +629,8 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                     b.Property<int?>("ClienteId")
                         .HasColumnType("int");
 
-                    b.Property<int>("EmpleadoId")
-                        .HasColumnType("int");
+                    b.Property<string>("EmpleadoId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
@@ -619,7 +661,7 @@ namespace Proyecto_Vivero.Server.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Proyecto_Vivero.Server.Models.ApplicationUser", null)
+                    b.HasOne("Proyecto_Vivero.Shared.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -628,7 +670,7 @@ namespace Proyecto_Vivero.Server.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Proyecto_Vivero.Server.Models.ApplicationUser", null)
+                    b.HasOne("Proyecto_Vivero.Shared.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -643,7 +685,7 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Proyecto_Vivero.Server.Models.ApplicationUser", null)
+                    b.HasOne("Proyecto_Vivero.Shared.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -652,11 +694,20 @@ namespace Proyecto_Vivero.Server.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Proyecto_Vivero.Server.Models.ApplicationUser", null)
+                    b.HasOne("Proyecto_Vivero.Shared.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Proyecto_Vivero.Shared.Compra", b =>
+                {
+                    b.HasOne("Proyecto_Vivero.Shared.ApplicationUser", "ApplicationUser")
+                        .WithMany("Compras")
+                        .HasForeignKey("EmpleadoId");
+
+                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("Proyecto_Vivero.Shared.CuentaCorriente", b =>
@@ -680,6 +731,25 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                     b.Navigation("Pago");
 
                     b.Navigation("Venta");
+                });
+
+            modelBuilder.Entity("Proyecto_Vivero.Shared.DetalleCompra", b =>
+                {
+                    b.HasOne("Proyecto_Vivero.Shared.Articulo", "Articulo")
+                        .WithMany()
+                        .HasForeignKey("ArticuloId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Proyecto_Vivero.Shared.Compra", "Compra")
+                        .WithMany("DetalleCompras")
+                        .HasForeignKey("CompraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Articulo");
+
+                    b.Navigation("Compra");
                 });
 
             modelBuilder.Entity("Proyecto_Vivero.Shared.DetallePedido", b =>
@@ -728,15 +798,13 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Proyecto_Vivero.Shared.Empleado", "Empleado")
-                        .WithMany()
-                        .HasForeignKey("EmpleadoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Proyecto_Vivero.Shared.ApplicationUser", "ApplicationUser")
+                        .WithMany("Pagos")
+                        .HasForeignKey("EmpleadoId");
+
+                    b.Navigation("ApplicationUser");
 
                     b.Navigation("Cliente");
-
-                    b.Navigation("Empleado");
                 });
 
             modelBuilder.Entity("Proyecto_Vivero.Shared.Pedido", b =>
@@ -756,15 +824,27 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                         .WithMany()
                         .HasForeignKey("ClienteId");
 
-                    b.HasOne("Proyecto_Vivero.Shared.Empleado", "Empleado")
-                        .WithMany()
-                        .HasForeignKey("EmpleadoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Proyecto_Vivero.Shared.ApplicationUser", "ApplicationUser")
+                        .WithMany("Ventas")
+                        .HasForeignKey("EmpleadoId");
+
+                    b.Navigation("ApplicationUser");
 
                     b.Navigation("Cliente");
+                });
 
-                    b.Navigation("Empleado");
+            modelBuilder.Entity("Proyecto_Vivero.Shared.ApplicationUser", b =>
+                {
+                    b.Navigation("Compras");
+
+                    b.Navigation("Pagos");
+
+                    b.Navigation("Ventas");
+                });
+
+            modelBuilder.Entity("Proyecto_Vivero.Shared.Compra", b =>
+                {
+                    b.Navigation("DetalleCompras");
                 });
 
             modelBuilder.Entity("Proyecto_Vivero.Shared.Pedido", b =>

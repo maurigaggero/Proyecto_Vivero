@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Proyecto_Vivero.Server.Data;
+using Proyecto_Vivero.Server.Common;
 using Proyecto_Vivero.Shared;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace Proyecto_Vivero.Server.Controllers
         public async Task<ActionResult<List<Pago>>> Get()
         {
             return await _context.Pagos.Include(x => x.Cliente)
-                .Include(x => x.Empleado)
+                .Include(x => x.ApplicationUser)
                 .Include(x => x.Cliente)
                 .ToListAsync();
         }
@@ -40,7 +41,7 @@ namespace Proyecto_Vivero.Server.Controllers
             DateTime f = Convert.ToDateTime(fecha);
 
             var queryable = _context.Pagos.Include(x => x.Cliente)
-                .Include(x => x.Empleado)
+                .Include(x => x.ApplicationUser)
                 .AsQueryable();
 
             if (f != DateTime.Today.AddDays(+1))
@@ -57,7 +58,7 @@ namespace Proyecto_Vivero.Server.Controllers
         public async Task<ActionResult<Pago>> Get(int id)
         {
             return await _context.Pagos.Include(x => x.Cliente)
-                .Include(x => x.Empleado)
+                .Include(x => x.ApplicationUser)
                 .FirstAsync(x => x.Id == id);
         }
 
@@ -65,6 +66,9 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<int>> Post(Pago pago)
         {
+            var userid = User.GetUserId();
+            pago.EmpleadoId = userid;
+
             _context.Pagos.Add(pago);
             try
             {
