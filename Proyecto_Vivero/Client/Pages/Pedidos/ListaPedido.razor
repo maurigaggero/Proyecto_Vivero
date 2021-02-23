@@ -70,7 +70,7 @@ else
                     <td><a href="/editar-pedido/@pedido.Id" style="color:white" class="btn btn-sm btn-warning"><i class="oi oi-pencil" aria-hidden="true"></i></a></td>
                     <td><button @onclick="@(() => BorrarPedido(pedido.Id))" class="btn btn-sm btn-danger"><i class="oi oi-trash" aria-hidden="true"></i></button></td>
                     <td>@pedido.Id</td>
-                    <td><b>@pedido.Cliente.NombreyApellido</b></td>
+                    <td><a href="editar-cliente/@pedido.ClienteId"><b>@pedido.Cliente.NombreyApellido</b></a></td>
                     <td><b>@pedido.Fecha</b></td>
                     <td>$@pedido.Seña</td>
                     <td>

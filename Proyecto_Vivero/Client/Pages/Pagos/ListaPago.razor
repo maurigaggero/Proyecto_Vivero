@@ -55,7 +55,7 @@ else
                     <td><a href="ver-pago/@pago.Id" class="btn btn-sm btn-primary" data-toggle="tooltip" title="Ver pago Id: @pago.Id"><i class="oi oi-eye"></i> Ver</a></td>
                     <td>@pago.Id</td>
                     <td>@pago.Fecha</td>
-                    <td><b>@pago.Cliente.NombreyApellido</b></td>
+                    <td><a href="editar-cliente/@pago.ClienteId"><b>@pago.Cliente.NombreyApellido</b></a></td>
                     <td>@pago.ApplicationUser.NombreyApellido</td>
                     <td><b>$@pago.Importe</b></td>
                 </tr>

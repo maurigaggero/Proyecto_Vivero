@@ -61,7 +61,7 @@ else
                     <td>@venta.FormaPago</td>
                     @if (venta.ClienteId != null)
                     {
-                        <td><b>@venta.Cliente.NombreyApellido</b></td>
+                        <td><a href="editar-cliente/@venta.ClienteId"><b>@venta.Cliente.NombreyApellido</b></a></td>
                     }
                     else
                     {
