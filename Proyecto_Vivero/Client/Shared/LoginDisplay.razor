@@ -6,12 +6,12 @@
 
 <AuthorizeView>
     <Authorized>
-        <a href="authentication/profile">Hello, @context.User.Identity.Name!</a>
-        <button class="nav-link btn btn-link" @onclick="BeginSignOut">Log out</button>
+        <a class="mr-1" href="authentication/profile"><b>Hola, @context.User.Identity.Name!</b></a>
+        <button class="btn btn-sm btn-outline-primary" @onclick="BeginSignOut">Cerrar sesión</button>
     </Authorized>
     <NotAuthorized>
-        <a href="authentication/register">Register</a>
-        <a href="authentication/login">Log in</a>
+        <a class="btn btn-sm btn-outline-primary" href="authentication/register">Registrarse</a>
+        <a class="btn btn-sm btn-outline-primary" href="authentication/login">Iniciar sesión</a>
     </NotAuthorized>
 </AuthorizeView>
 
