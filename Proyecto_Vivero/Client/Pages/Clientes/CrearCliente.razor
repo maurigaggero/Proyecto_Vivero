@@ -29,7 +29,7 @@
         else
         {
             await JS.InvokeVoidAsync("simple", "Error",
-                    "No se pudo crear cliente", "error");
+                    $"DNI: {cliente.Dni} ya registrado.", "error");
         }
     }
 }

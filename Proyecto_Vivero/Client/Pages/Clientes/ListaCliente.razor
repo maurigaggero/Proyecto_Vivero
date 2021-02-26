@@ -70,7 +70,7 @@ else
                     }
                     else
                     {
-                        <img class="card-img-top" src="indefinido.png" alt="Cliente" />
+                        <img class="card-img-top" src="noimage.png" alt="Cliente" />
                     }
                     <div class="card-body">
                         <h5 class="card-title">
@@ -107,7 +107,20 @@ else
                     <td><a href="/editar-cliente/@cliente.Id" style="color:white" class="btn btn-sm btn-primary"><i class="oi oi-eye"></i> Ver</a></td>
                     <td><b>@cliente.NombreyApellido</b></td>
                     <td>@cliente.Dni</td>
-                    <td>@cliente.Sexo</td>
+                    <td>
+                        @if (cliente.Sexo == Cliente.Sexos.Masculino)
+                        {
+                            <text>M</text>
+                        }
+                        else if (cliente.Sexo == Cliente.Sexos.Femenino)
+                        {
+                            <text>F</text>
+                        }
+                        else
+                        {
+                            <text>N/E</text>
+                        }
+                    </td>
                     <td>@cliente.Dirección</td>
                     <td>@cliente.Teléfono</td>
 
