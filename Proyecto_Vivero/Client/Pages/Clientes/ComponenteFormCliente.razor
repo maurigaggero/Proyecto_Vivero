@@ -57,19 +57,6 @@
                 <ValidationMessage For="@(() => cliente.Teléfono)" />
             </div>
         </div>
-
-        <div class="form-group row">
-            <label class="col-3 col-form-label">Saldo cuenta</label>
-            <div class="col">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" id="inputGroup-sizing-default">$</span>
-                    </div>
-                    <InputNumber @bind-Value="@cliente.Saldo" step="0.01" class="form-control" />
-                    <ValidationMessage For="@(() => cliente.Saldo)" />
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="d-flex justify-content-center m-2">
