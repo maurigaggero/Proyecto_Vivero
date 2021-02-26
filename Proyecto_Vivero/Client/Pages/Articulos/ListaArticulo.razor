@@ -15,7 +15,6 @@
     </div>
     <div class="input-group" style="width:60%">
         <input class="form-control" type="text" placeholder="Nombre artículo" @bind="NombreArtFiltro" />
-        <input class="form-control" type="text" placeholder="Categoria artículo" @bind="CategoriaArtFiltro" />
         <div class="input-group-append">
             <button @onclick="Filtrar" class="btn btn-primary" type="button"><i class="oi oi-magnifying-glass"></i></button>
             <button @onclick="Limpiar" class="btn btn-danger" type="button"><i class="oi oi-delete"></i></button>
@@ -56,47 +55,47 @@ else if (articulo.Count == 0)
 }
 else
 {
-<div class="card-columns" hidden="@card">
-    @foreach (var articulo in articulo)
-    {
-        <a href="/editar-articulo/@articulo.Id" style="color: inherit">
-            <div class="card text-right" style="background-color:lightgoldenrodyellow; border-radius:6px;">
-                @if (articulo.Url_Imagen == null || articulo.Url_Imagen == "")
-                {
-                    <img class="card-img-top" src="noimage.png" alt="Card image cap">
-                }
-                else
-                {
-                    <img class="card-img-top" src="@articulo.Url_Imagen" alt="Card image cap">
-                }
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <b>@articulo.Nombre</b>
-                    </h5>
-                    <p class="card-subtitle">
-                        @articulo.Categoria
-                    </p>
-                    <p class="card-text">
-                        PRECIO: <b>$@articulo.PrecioUnitario</b>
-                        <br />
-                        @if (articulo.StockActual < articulo.StockMinimo)
-                        {
-                            <b style="color:darkred">STOCK BAJO: @articulo.StockActual</b>
-                        }
-                        else if (articulo.StockActual > articulo.StockMaximo)
-                        {
-                            <b style="color:darkorange">STOCK EXCEDIDO: @articulo.StockActual</b>
-                        }
-                        else
-                        {
-                            <b style="color:green">STOCK: @articulo.StockActual</b>
-                        }
-                    </p>
+    <div class="card-columns" hidden="@card">
+        @foreach (var articulo in articulo)
+        {
+            <a href="/editar-articulo/@articulo.Id" style="color: inherit">
+                <div class="card text-right" style="background-color:lightgoldenrodyellow; border-radius:6px;">
+                    @if (articulo.Url_Imagen == null || articulo.Url_Imagen == "")
+                    {
+                        <img class="card-img-top" src="noimage.png" alt="Card image cap">
+                    }
+                    else
+                    {
+                        <img class="card-img-top" src="@articulo.Url_Imagen" alt="Card image cap">
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <b>@articulo.Nombre</b>
+                        </h5>
+                        <p class="card-subtitle">
+                            @articulo.Categoria
+                        </p>
+                        <p class="card-text">
+                            PRECIO: <b>$@articulo.PrecioUnitario</b>
+                            <br />
+                            @if (articulo.StockActual < articulo.StockMinimo)
+                            {
+                                <b style="color:darkred">STOCK BAJO: @articulo.StockActual</b>
+                            }
+                            else if (articulo.StockActual > articulo.StockMaximo)
+                            {
+                                <b style="color:darkorange">STOCK EXCEDIDO: @articulo.StockActual</b>
+                            }
+                            else
+                            {
+                                <b style="color:green">STOCK: @articulo.StockActual</b>
+                            }
+                        </p>
+                    </div>
                 </div>
-            </div>
-        </a>
-    }
-</div>
+            </a>
+        }
+    </div>
 
     <table class="table table-hover" hidden="@lista">
         <thead class="thead-dark">
@@ -149,7 +148,6 @@ else
     public List<Articulo> articulo { get; set; } //muestra todos los articulos
 
     private string NombreArtFiltro = String.Empty; //filtros
-    private string CategoriaArtFiltro = String.Empty;
 
     protected bool lista = true;
     protected bool card = false;
@@ -161,7 +159,7 @@ else
 
     async Task CargarArticulos()
     {
-        var httpResponse = await Http.GetAsync($"api/articulos/filtro?nombre={NombreArtFiltro}&categoria={CategoriaArtFiltro}");
+        var httpResponse = await Http.GetAsync($"api/articulos/filtro?nombre={NombreArtFiltro}");
         if (httpResponse.IsSuccessStatusCode)
         {
             var responseString = await httpResponse.Content.ReadAsStringAsync();
@@ -203,7 +201,6 @@ else
     private async Task Limpiar()
     {
         NombreArtFiltro = string.Empty;
-        CategoriaArtFiltro = string.Empty;
         await CargarArticulos();
     }
 }

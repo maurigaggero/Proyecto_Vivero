@@ -20,7 +20,7 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Categoria = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Categoria = table.Column<int>(type: "int", nullable: false),
                     Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Url_Imagen = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PrecioMayorista = table.Column<decimal>(type: "decimal(18,2)", nullable: false),

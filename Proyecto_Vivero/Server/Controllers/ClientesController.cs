@@ -57,28 +57,13 @@ namespace Proyecto_Vivero.Server.Controllers
             if (!(_context.Clientes.Any(e => e.Dni == cliente.Dni)))
             {
                 _context.Clientes.Add(cliente);
+                await _context.SaveChangesAsync();
+                return Ok();
             }
             else
             {
                 return Conflict();
             }
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (Exists(cliente.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            return Ok();
         }
 
 

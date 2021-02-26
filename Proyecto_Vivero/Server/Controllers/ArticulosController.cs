@@ -32,16 +32,12 @@ namespace Proyecto_Vivero.Server.Controllers
 
         //GET: api/articulos/filtro/nombre&categoria
         [HttpGet("filtro")]
-        public async Task<ActionResult<List<Articulo>>> Get([FromQuery] string nombre, [FromQuery] string categoria)
+        public async Task<ActionResult<List<Articulo>>> Get([FromQuery] string nombre)
         {
             var queryable = _context.Articulos.OrderBy(x => x.Nombre).AsQueryable();
             if (!string.IsNullOrEmpty(nombre))
             {
                 queryable = queryable.Where(x => x.Nombre.Contains(nombre));
-            }
-            if (!string.IsNullOrEmpty(categoria))
-            {
-                queryable = queryable.Where(x => x.Categoria.Contains(categoria));
             }
             return await queryable.ToListAsync();
         }
@@ -94,7 +90,6 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpPut("stock/{newstock}")]
         public async Task<ActionResult> PutStock(Articulo articulo, int newstock)
         {
-
             _context.Entry(articulo).State = EntityState.Modified;
             articulo.Ultima_Modificación = DateTime.Now;
             articulo.StockActual = newstock;

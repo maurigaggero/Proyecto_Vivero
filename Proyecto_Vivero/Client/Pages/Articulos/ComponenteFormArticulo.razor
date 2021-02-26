@@ -25,16 +25,11 @@
                     <label class="col-4 col-form-label">Categoría</label>
                     <div class="col">
                         <div class="input-group">
-                            <InputSelect @bind-Value="articulo.Categoria" class="custom-select" name="categoria">
-                                <option selected value="">Seleccione una categoría</option>
-                                <option value="PLANTA DE ADENTRO"> Planta Adentro</option>
-                                <option value="PLANTA DE AFUERA"> Planta Afuera</option>
-                                <option value="MACETA"> Maceta</option>
-                                <option value="FERTILIZANTE"> Fertilizante</option>
-                                <option value="SEMILLA"> Semilla</option>
-                                <option value="TIERRA"> Tierra</option>
-                                <option value="PIE NORDICO"> Pie Nóridco</option>
-                                <option value="OTRA"> Otra</option>
+                            <InputSelect @bind-Value="articulo.Categoria" class="form-control">
+                                @foreach (string item in Enum.GetNames(typeof(Articulo.Categorias)))
+                                {
+                                    <option value="@item"> @item</option>
+                                }
                             </InputSelect>
                         </div>
                         <ValidationMessage For="@(() => articulo.Categoria)" />
