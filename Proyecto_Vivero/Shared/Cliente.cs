@@ -17,7 +17,7 @@ namespace Proyecto_Vivero.Shared
         [Required]
         public string NombreyApellido { get; set; }
         [Required]
-        [MaxLength(8, ErrorMessage = "Máximo 8 números"), MinLength (7, ErrorMessage = "Minimo 7 números")]
+        [MaxLength(8, ErrorMessage = "Máximo 8 dígitos"), MinLength (7, ErrorMessage = "Minimo 7 dígitos")]
         [Phone(ErrorMessage = "Sólo números")]
         public string Dni { get; set; }
         [Required, EnumDataType(typeof(Sexos))]
