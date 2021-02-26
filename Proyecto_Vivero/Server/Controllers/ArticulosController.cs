@@ -30,7 +30,7 @@ namespace Proyecto_Vivero.Server.Controllers
             return await _context.Articulos.OrderBy(x => x.Nombre).ToListAsync();
         }
 
-        //GET: api/articulos/filtro/nombre&categoria
+        //GET: api/articulos/filtro/nombre
         [HttpGet("filtro")]
         public async Task<ActionResult<List<Articulo>>> Get([FromQuery] string nombre)
         {

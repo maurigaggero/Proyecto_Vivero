@@ -15,7 +15,6 @@
     </div>
     <div class="input-group" style="width:60%">
         <input class="form-control" type="date" placeholder="Fecha venta" @bind="FechaFiltro" />
-        <input class="form-control" type="text" placeholder="Nombre cliente" @bind="ClienteFiltro" />
         <input class="form-control" type="text" placeholder="Nombre empleado" @bind="EmpleadoFiltro" />
         <div class="input-group-append">
             <button @onclick="Filtrar" class="btn btn-primary" type="button"><i class="oi oi-magnifying-glass"></i></button>
@@ -78,8 +77,6 @@ else
     public List<Venta> ventas { get; set; }
 
     private DateTime FechaFiltro = DateTime.Today.AddDays(+1);
-
-    private string ClienteFiltro = String.Empty;
     private string EmpleadoFiltro = String.Empty;
 
     protected override async Task OnInitializedAsync()
@@ -92,14 +89,13 @@ else
         {
             exception.Redirect();
         }
-
     }
 
     async Task CargarVentas()
     {
         string fecha = Convert.ToString(FechaFiltro);
 
-        var httpResponse = await Http.GetAsync($"api/ventas/filtro?cliente={ClienteFiltro}&empleado={EmpleadoFiltro}&fecha={fecha}");
+        var httpResponse = await Http.GetAsync($"api/ventas/filtro?empleado={EmpleadoFiltro}&fecha={fecha}");
         if (httpResponse.IsSuccessStatusCode)
         {
             var responseString = await httpResponse.Content.ReadAsStringAsync();
@@ -124,7 +120,6 @@ else
 
     private async Task Limpiar()
     {
-        ClienteFiltro = string.Empty;
         EmpleadoFiltro = string.Empty;
         FechaFiltro = DateTime.Today.AddDays(+1);
         await CargarVentas();

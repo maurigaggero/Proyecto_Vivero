@@ -34,7 +34,7 @@ namespace Proyecto_Vivero.Server.Controllers
                 .ToListAsync();
         }
 
-        //GET: api/pagos/filtro/cliente&empleado&fecha
+        //GET: api/pagos/filtro/empleado&fecha
         [HttpGet("filtro")]
         public async Task<ActionResult<List<Pago>>> Get([FromQuery] string fecha)
         {

@@ -37,7 +37,7 @@ namespace Proyecto_Vivero.Server.Controllers
 
         //GET: api/ventas/filtro/cliente&empleado&fecha
         [HttpGet("filtro")]
-        public async Task<ActionResult<List<Venta>>> Get([FromQuery] string cliente, [FromQuery] string empleado, [FromQuery] string fecha)
+        public async Task<ActionResult<List<Venta>>> Get([FromQuery] string empleado, [FromQuery] string fecha)
         {
             DateTime f = Convert.ToDateTime(fecha);
 
@@ -46,10 +46,6 @@ namespace Proyecto_Vivero.Server.Controllers
                 .Include(x => x.DetalleVentas)
                 .ThenInclude(x => x.Articulo).AsQueryable();
 
-            if (!string.IsNullOrEmpty(cliente))
-            {
-                queryable = queryable.Where(x => x.Cliente.NombreyApellido.Contains(cliente));
-            }
             if (!string.IsNullOrEmpty(empleado))
             {
                 queryable = queryable.Where(x => x.ApplicationUser.NombreyApellido.Contains(empleado));
@@ -60,7 +56,6 @@ namespace Proyecto_Vivero.Server.Controllers
                                             x.Fecha.Month == f.Month &&
                                             x.Fecha.Year == f.Year);
             }
-
             return await queryable.OrderByDescending(x => x.Fecha).ToListAsync();
         }
 
@@ -191,54 +186,6 @@ namespace Proyecto_Vivero.Server.Controllers
                     }
                     break;
             }
-        }
-
-        // PUT: api/ventas
-        [HttpPut]
-        public async Task<ActionResult> Put(Venta venta)
-        {
-            _context.Entry(venta).State = EntityState.Modified;
-
-            foreach (var detalle in venta.DetalleVentas)
-            {
-                if (detalle.Id != 0)
-                {
-                    //_context.Entry(detalle).State = EntityState.Modified; //en desarrollo
-                }
-                else
-                {
-                    _context.Entry(detalle).State = EntityState.Added;
-
-                    await ActualizaStock(venta, "create");
-                }
-            }
-            var listadodetalle_ids = venta.DetalleVentas.Select(x => x.Id).ToList();
-            var detallesborrar = await _context
-                .DetalleVentas
-                .Where(x => !listadodetalle_ids.Contains(x.Id) && x.VentaId == venta.Id)
-                .ToListAsync();
-
-
-            _context.RemoveRange(detallesborrar);
-            //actualiza stock de borrado
-            ArticulosController articulos = new ArticulosController(_context);
-            var a = await articulos.Get();
-            for (int i = 0; i < detallesborrar.Count; i++)
-            {
-                for (int j = 0; j < a.Value.Count; j++)
-                {
-                    if (a.Value[j].Id == detallesborrar[i].ArticuloId)
-                    {
-                        var newstock = a.Value[j].StockActual + detallesborrar[i].Cantidad;
-
-                        await articulos.PutStock(a.Value[j], newstock);
-                    }
-                }
-            }
-
-            await _context.SaveChangesAsync();
-
-            return Ok();
         }
 
         // DELETE: api/ventas/5  
