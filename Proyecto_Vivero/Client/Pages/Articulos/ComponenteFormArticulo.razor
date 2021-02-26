@@ -15,7 +15,7 @@
                     <label class="col-4 col-form-label">Nombre</label>
                     <div class="col">
                         <div class="input-group">
-                            <InputText @bind-Value="@articulo.Nombre" oninput="this.value=this.value.toUpperCase()" class="form-control" />
+                            <InputText @bind-Value="@articulo.Nombre" oninput="this.value=this.value.toUpperCase()" placeholder="Nombre artículo" class="form-control" />
                         </div>
                         <ValidationMessage For="@(() => articulo.Nombre)" />
                     </div>
@@ -40,7 +40,7 @@
                     <label class="col-4 col-form-label">Descripción</label>
                     <div class="col">
                         <div class="input-group">
-                            <InputText @bind-Value="@articulo.Descripcion" oninput="this.value=this.value.toUpperCase()" class="form-control" />
+                            <InputText @bind-Value="@articulo.Descripcion" oninput="this.value=this.value.toUpperCase()" placeholder="Descripción" class="form-control" />
                         </div>
                     </div>
                 </div>
@@ -49,7 +49,7 @@
                     <label class="col-4 col-form-label">Url Imagen</label>
                     <div class="col">
                         <div class="input-group">
-                            <InputText @bind-Value="@articulo.Url_Imagen" class="form-control" />
+                            <InputText @bind-Value="@articulo.Url_Imagen" placeholder="URL Imagen" class="form-control" />
                             <div class="input-group-prepend">
                                 <button @onclick="@(() => articulo.Url_Imagen = null)" class="btn btn-secondary" type="button">
                                     <i class="oi oi-delete"></i>
