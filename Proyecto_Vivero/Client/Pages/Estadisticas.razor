@@ -65,16 +65,16 @@ else
     {
         ventas = await Http.GetFromJsonAsync<List<Venta>>($"api/ventas");
 
-        await MostrarEstadisticas();
-    }
-
-    async Task MostrarEstadisticas()
-    {
         ejercicio = await Http.GetFromJsonAsync<decimal[]>($"api/estadisticas/ejercicio");
         ventasAño = await Http.GetFromJsonAsync<decimal[]>($"api/estadisticas/ventas");
         pedidospendientes = await Http.GetFromJsonAsync<int>("api/estadisticas/cantpendientes");
 
-        await JS.InvokeVoidAsync("chart_line", ejercicio);
-        await JS.InvokeVoidAsync("chart_column", ventasAño);
+        MostrarEstadisticas();
+    }
+
+    void MostrarEstadisticas()
+    {
+        JS.InvokeVoidAsync("chart_line", ejercicio);
+        JS.InvokeVoidAsync("chart_column", ventasAño);
     }
 }

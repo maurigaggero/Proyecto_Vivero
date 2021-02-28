@@ -49,7 +49,6 @@ namespace Proyecto_Vivero.Server.Controllers
             return await _context.Articulos.FirstAsync(x => x.Id == id);
         }
 
-
         // POST: api/articulos 
         [HttpPost]
         public async Task<ActionResult> Post(Articulo articulo)
@@ -74,25 +73,12 @@ namespace Proyecto_Vivero.Server.Controllers
             return Ok();
         }
 
-
         // PUT: api/articulos
         [HttpPut]
         public async Task<ActionResult> Put(Articulo articulo)
         {
-
             _context.Entry(articulo).State = EntityState.Modified;
             articulo.Ultima_Modificación = DateTime.Now;
-            await _context.SaveChangesAsync();
-            return Ok();
-        }
-
-        // PUT: api/articulos
-        [HttpPut("stock/{newstock}")]
-        public async Task<ActionResult> PutStock(Articulo articulo, int newstock)
-        {
-            _context.Entry(articulo).State = EntityState.Modified;
-            articulo.Ultima_Modificación = DateTime.Now;
-            articulo.StockActual = newstock;
             await _context.SaveChangesAsync();
             return Ok();
         }
