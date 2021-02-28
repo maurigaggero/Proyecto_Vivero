@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Proyecto_Vivero.Server.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class EstadisticasController : ControllerBase
