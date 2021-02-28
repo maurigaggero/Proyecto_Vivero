@@ -59,9 +59,9 @@ namespace Proyecto_Vivero.Server.Controllers
             return meses;
         }
 
-        // GET: api/estadisticas/cantpendientes
-        [HttpGet("cantpendientes")]
-        public async Task<ActionResult<int>> GetCantPendientes()
+        // GET: api/estadisticas/pendientes
+        [HttpGet("pendientes")]
+        public async Task<ActionResult<int>> GetPedidosPendientes()
         {
             return await _context.Pedidos.Where(x => x.Finalizado == false).CountAsync();
         }

@@ -67,7 +67,7 @@ else
 
         ejercicio = await Http.GetFromJsonAsync<decimal[]>($"api/estadisticas/ejercicio");
         ventasAño = await Http.GetFromJsonAsync<decimal[]>($"api/estadisticas/ventas");
-        pedidospendientes = await Http.GetFromJsonAsync<int>("api/estadisticas/cantpendientes");
+        pedidospendientes = await Http.GetFromJsonAsync<int>("api/estadisticas/pendientes");
 
         MostrarEstadisticas();
     }
