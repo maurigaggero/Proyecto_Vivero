@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Proyecto_Vivero.Server.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class EstadisticasController : ControllerBase
@@ -22,124 +22,41 @@ namespace Proyecto_Vivero.Server.Controllers
             _context = context;
         }
 
-        ////GET: api/estadisticas/ingresos/tiempo
-        [HttpGet("ingresos/{tiempo}")]
-        public async Task<ActionResult<Tuple<decimal, decimal>>> GetIngresos(string tiempo)
+        ////GET: api/estadisticas/ejercicio/
+        [HttpGet("ejercicio")]
+        public decimal[] GetEjercicio()
         {
-            var queryableA = _context.Ventas.AsQueryable();
-            var queryableB = _context.Ventas.AsQueryable();
-            var queryableC = _context.Pagos.AsQueryable();
-            var queryableD = _context.Pagos.AsQueryable();
+            int año = DateTime.Today.Year;
 
-            switch (tiempo)
+            decimal[] meses = new decimal[12];
+
+            for (int i = 1; i < meses.Length; i++)
             {
-                case "dia":
-                    queryableA = queryableA.Where(x => x.Fecha.Date == DateTime.Today.Date);
-                    queryableB = queryableB.Where(x => x.Fecha.Date == DateTime.Today.Date.AddDays(-1));
-                    queryableC = queryableC.Where(x => x.Fecha.Date == DateTime.Today.Date);
-                    queryableD = queryableD.Where(x => x.Fecha.Date == DateTime.Today.Date.AddDays(-1));
-                    break;
-
-                case "mes":
-                    queryableA = queryableA.Where(x => x.Fecha.Date > DateTime.Today.Date.AddDays(-30)
-                                   && x.Fecha.Date <= DateTime.Today.Date);
-                    queryableB = queryableB.Where(x => x.Fecha.Date < DateTime.Today.Date.AddMonths(-2)
-                                   && x.Fecha.Date <= DateTime.Today.Date.AddMonths(-1));
-                    queryableC = queryableC.Where(x => x.Fecha.Date > DateTime.Today.Date.AddDays(-30)
-                                   && x.Fecha.Date <= DateTime.Today.Date);
-                    queryableD = queryableD.Where(x => x.Fecha.Date < DateTime.Today.Date.AddMonths(-2)
-                                   && x.Fecha.Date <= DateTime.Today.Date.AddMonths(-1));
-                    break;
-
-                case "año":
-                    queryableA = queryableA.Where(x => x.Fecha.Date > DateTime.Today.Date.AddYears(-1)
-                                  && x.Fecha.Date <= DateTime.Today.Date);
-                    queryableB = queryableB.Where(x => x.Fecha.Date > DateTime.Today.Date.AddYears(-2)
-                                 && x.Fecha.Date <= DateTime.Today.Date.AddYears(-1));
-                    queryableC = queryableC.Where(x => x.Fecha.Date > DateTime.Today.Date.AddYears(-1)
-                                  && x.Fecha.Date <= DateTime.Today.Date);
-                    queryableD = queryableD.Where(x => x.Fecha.Date > DateTime.Today.Date.AddYears(-2)
-                                 && x.Fecha.Date <= DateTime.Today.Date.AddYears(-1));
-                    break;
+                meses[i-1] = _context.Ventas
+                .Where(x => x.Fecha.Date.Month == i && x.Fecha.Date.Year == año
+                       && x.FormaPago != FormasPago.CuentaCorriente)
+                .Sum(x => x.Total) + _context.Pagos
+                .Where(x => x.Fecha.Date.Month == i && x.Fecha.Date.Year == año)
+                .Sum(x => x.Importe);
             }
-
-            decimal actual = await queryableA.Where(x => x.FormaPago != FormasPago.CuentaCorriente)
-                .SumAsync(x => x.Total) + await queryableC.SumAsync(x => x.Importe);
-
-            decimal anterior = await queryableB.Where(x => x.FormaPago != FormasPago.CuentaCorriente)
-                .SumAsync(x => x.Total) + await queryableD.SumAsync(x => x.Importe);
-
-            return Tuple.Create(actual, anterior);
+            return meses;
         }
 
-        //GET: api/estadisticas/total/tiempo
-        [HttpGet("total/{tiempo}")]
-        public async Task<ActionResult<Tuple<decimal,decimal>>> GetTotal(string tiempo)
+        ////GET: api/estadisticas/ventas/
+        [HttpGet("ventas")]
+        public decimal[] GetVentas()
         {
-            var queryableA = _context.Ventas.AsQueryable();
-            var queryableB = _context.Ventas.AsQueryable();
+            int año = DateTime.Today.Year;
 
-            switch (tiempo)
+            decimal[] meses = new decimal[12];
+
+            for (int i = 1; i < meses.Length; i++)
             {
-                case "dia":
-                    queryableA = queryableA.Where(x => x.Fecha.Date == DateTime.Today.Date);
-                    queryableB = queryableB.Where(x => x.Fecha.Date == DateTime.Today.Date.AddDays(-1));
-                    break;
-
-                case "mes":
-                    queryableA = queryableA.Where(x => x.Fecha.Date > DateTime.Today.Date.AddDays(-30)
-                                   && x.Fecha.Date <= DateTime.Today.Date);
-                    queryableB = queryableB.Where(x => x.Fecha.Date < DateTime.Today.Date.AddMonths(-2)
-                                   && x.Fecha.Date <= DateTime.Today.Date.AddMonths(-1));
-                    break;
-
-                case "año":
-                    queryableA = queryableA.Where(x => x.Fecha.Date > DateTime.Today.Date.AddYears(-1)
-                                  && x.Fecha.Date <= DateTime.Today.Date);
-                    queryableB = queryableB.Where(x => x.Fecha.Date > DateTime.Today.Date.AddYears(-2)
-                                 && x.Fecha.Date <= DateTime.Today.Date.AddYears(-1));
-                    break;
+                meses[i-1] = _context.Ventas
+                .Where(x => x.Fecha.Date.Month == i && x.Fecha.Date.Year == año)
+                .Count();
             }
-
-            decimal actual = await queryableA.SumAsync(x => x.Total);
-            decimal anterior = await queryableB.SumAsync(x => x.Total);
-
-            return Tuple.Create(actual, anterior);
-        }
-
-        //GET: api/estadisticas/cantidad/tiempo
-        [HttpGet("cantidad/{tiempo}")]
-        public async Task<ActionResult<Tuple<int,int>>> GetCantidad(string tiempo)
-        {
-            var queryableA = _context.Ventas.AsQueryable();
-            var queryableB = _context.Ventas.AsQueryable();
-
-            switch (tiempo)
-            {
-                case "dia":
-                    queryableA = queryableA.Where(x => x.Fecha.Date == DateTime.Today.Date);
-                    queryableB = queryableB.Where(x => x.Fecha.Date == DateTime.Today.Date.AddDays(-1));
-                    break;
-
-                case "mes":
-                    queryableA = queryableA.Where(x => x.Fecha.Date > DateTime.Today.Date.AddDays(-30)
-                                   && x.Fecha.Date <= DateTime.Today.Date);
-                    queryableB = queryableB.Where(x => x.Fecha.Date < DateTime.Today.Date.AddMonths(-2)
-                                   && x.Fecha.Date <= DateTime.Today.Date.AddMonths(-1));
-                    break;
-
-                case "año":
-                    queryableA = queryableA.Where(x => x.Fecha.Date > DateTime.Today.Date.AddYears(-1)
-                                  && x.Fecha.Date <= DateTime.Today.Date);
-                    queryableB = queryableB.Where(x => x.Fecha.Date > DateTime.Today.Date.AddYears(-2)
-                                 && x.Fecha.Date <= DateTime.Today.Date.AddYears(-1));
-                    break;
-            }
-
-            int actual = await queryableA.CountAsync();
-            int anterior = await queryableB.CountAsync();
-
-            return Tuple.Create(actual, anterior);
+            return meses;
         }
 
         // GET: api/estadisticas/cantpendientes
