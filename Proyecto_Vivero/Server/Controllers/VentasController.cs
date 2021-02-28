@@ -74,16 +74,44 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<int>> Post(Venta venta)
         {
-            var userid = User.GetUserId();
-            venta.EmpleadoId = userid;
             _context.Ventas.Add(venta);
             try
             {
+                var userid = User.GetUserId();
+                venta.EmpleadoId = userid;
                 venta.Fecha = DateTime.Now;
-
-                await ActualizaStock(venta, "create");
-
                 await _context.SaveChangesAsync();
+
+                var lista_articulo = await _context.Articulos.ToListAsync();
+
+                ArticulosController articulos = new ArticulosController(_context);
+                foreach (var detalle in venta.DetalleVentas)
+                {
+                    var articulo = lista_articulo.First(x => x.Id == detalle.ArticuloId);
+                    articulo.StockActual = articulo.StockActual - detalle.Cantidad;
+                    await articulos.Put(articulo);
+                }
+
+                if (venta.ClienteId != null)
+                {
+                    var cliente = await _context.Clientes.FirstAsync(x => x.Id == venta.ClienteId);
+                    cliente.Saldo = cliente.Saldo + venta.Total;
+
+                    ClientesController c = new ClientesController(_context);
+                    await c.Put(cliente);
+
+                    CuentasCorrientesController cc = new CuentasCorrientesController(_context);
+                    CuentaCorriente cuenta = new CuentaCorriente()
+                    {
+                        Fecha = venta.Fecha,
+                        VentaId = venta.Id,
+                        ClienteId = Convert.ToInt32(venta.ClienteId),
+                        Concepto = CuentaCorriente.Conceptos.Debe,
+                        Importe = venta.Total,
+                        Saldo_Parcial = venta.Cliente.Saldo
+                    };
+                    await cc.Post(cuenta);
+                }
             }
             catch (DbUpdateException)
             {
@@ -96,96 +124,7 @@ namespace Proyecto_Vivero.Server.Controllers
                     throw;
                 }
             }
-
-            if (venta.ClienteId != null)
-            {
-                await ActualizaCliente(venta, "create");
-
-                CuentasCorrientesController controller = new CuentasCorrientesController(_context);
-                CuentaCorriente cuenta = new CuentaCorriente()
-                {
-                    Fecha = venta.Fecha,
-                    VentaId = venta.Id,
-                    ClienteId = Convert.ToInt32(venta.ClienteId),
-                    Concepto = CuentaCorriente.Conceptos.Debe,
-                    Importe = venta.Total,
-                    Saldo_Parcial = venta.Cliente.Saldo
-                };
-                await controller.Post(cuenta);
-            }
             return venta.Id;
-        }
-
-        public async Task ActualizaCliente(Venta venta, string accion)
-        {
-            ClientesController cliente = new ClientesController(_context);
-            var c = await cliente.Get();
-
-            switch (accion)
-            {
-                case "create":
-                    for (int i = 0; i < c.Value.Count; i++)
-                    {
-                        if (c.Value[i].Id == venta.ClienteId)
-                        {
-                            var newsaldo = c.Value[i].Saldo + venta.Total;
-
-                            await cliente.PutSaldo(c.Value[i], newsaldo);
-                        }
-                    }
-                    break;
-                case "delete":
-                    for (int i = 0; i < c.Value.Count; i++)
-                    {
-                        if (c.Value[i].Id == venta.ClienteId)
-                        {
-                            var newsaldo = c.Value[i].Saldo - venta.Total;
-
-                            await cliente.PutSaldo(c.Value[i], newsaldo);
-                        }
-                    }
-                    break;
-            }
-        }
-
-        public async Task ActualizaStock(Venta venta, string accion)
-        {
-            ArticulosController articulos = new ArticulosController(_context);
-
-            var a = await articulos.Get();
-
-            switch (accion)
-            {
-                case "create":
-                    for (int i = 0; i < venta.DetalleVentas.Count; i++)
-                    {
-                        for (int j = 0; j < a.Value.Count; j++)
-                        {
-                            if (a.Value[j].Id == venta.DetalleVentas[i].ArticuloId)
-                            {
-                                var newstock = a.Value[j].StockActual - venta.DetalleVentas[i].Cantidad;
-
-                                await articulos.PutStock(a.Value[j], newstock);
-                            }
-                        }
-                    }
-                    break;
-
-                case "delete":
-                    for (int i = 0; i < venta.DetalleVentas.Count; i++)
-                    {
-                        for (int j = 0; j < a.Value.Count; j++)
-                        {
-                            if (a.Value[j].Id == venta.DetalleVentas[i].ArticuloId)
-                            {
-                                var newstock = a.Value[j].StockActual + venta.DetalleVentas[i].Cantidad;
-
-                                await articulos.PutStock(a.Value[j], newstock);
-                            }
-                        }
-                    }
-                    break;
-            }
         }
 
         // DELETE: api/ventas/5  
@@ -195,25 +134,39 @@ namespace Proyecto_Vivero.Server.Controllers
             var venta = await _context.Ventas.Include(x => x.DetalleVentas)
                 .FirstAsync(x => x.Id == id);
 
-            if (venta == null)
+            if (venta != null)
+            {
+                if (venta.ClienteId != null)
+                {
+                    var cliente = await _context.Clientes.FirstAsync(x => x.Id == venta.ClienteId);
+                    cliente.Saldo = cliente.Saldo - venta.Total;
+
+                    ClientesController c = new ClientesController(_context);
+                    await c.Put(cliente);
+
+                    CuentasCorrientesController cc = new CuentasCorrientesController(_context);
+                    await cc.Delete("venta", venta.Id);
+                }
+
+                var lista_articulo = await _context.Articulos.ToListAsync();
+
+                ArticulosController articulos = new ArticulosController(_context);
+                foreach (var detalle in venta.DetalleVentas)
+                {
+                    var articulo = lista_articulo.First(x => x.Id == detalle.ArticuloId);
+                    articulo.StockActual = articulo.StockActual + detalle.Cantidad;
+                    await articulos.Put(articulo);
+                }
+
+                _context.Ventas.Remove(venta);
+                await _context.SaveChangesAsync();
+
+                return venta;
+            }
+            else
             {
                 return NotFound();
             }
-
-            if (venta.ClienteId != null)
-            {
-                await ActualizaCliente(venta, "delete");
-
-                CuentasCorrientesController controller = new CuentasCorrientesController(_context);
-                await controller.Delete("venta", venta.Id);
-            }
-
-            await ActualizaStock(venta, "delete");
-
-            _context.Ventas.Remove(venta);
-            await _context.SaveChangesAsync();
-
-            return venta;
         }
 
         private bool Exists(int id)

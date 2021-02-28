@@ -66,17 +66,32 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<int>> Post(Pago pago)
         {
-            var userid = User.GetUserId();
-            pago.EmpleadoId = userid;
-
             _context.Pagos.Add(pago);
             try
             {
+                var userid = User.GetUserId();
+                pago.EmpleadoId = userid;
                 pago.Fecha = DateTime.Now;
 
-                await ActualizaCliente(pago, "create");
-
                 await _context.SaveChangesAsync();
+
+                var cliente = await _context.Clientes.FirstAsync(x => x.Id == pago.ClienteId);
+                cliente.Saldo = cliente.Saldo - pago.Importe;
+
+                ClientesController c = new ClientesController(_context);
+                await c.Put(cliente);
+
+                CuentasCorrientesController cc = new CuentasCorrientesController(_context);
+                CuentaCorriente cuenta = new CuentaCorriente()
+                {
+                    Fecha = pago.Fecha,
+                    PagoId = pago.Id,
+                    ClienteId = Convert.ToInt32(pago.ClienteId),
+                    Concepto = CuentaCorriente.Conceptos.Haber,
+                    Importe = pago.Importe,
+                    Saldo_Parcial = pago.Cliente.Saldo
+                };
+                await cc.Post(cuenta);
             }
             catch (DbUpdateException)
             {
@@ -89,63 +104,15 @@ namespace Proyecto_Vivero.Server.Controllers
                     throw;
                 }
             }
-
-            CuentasCorrientesController controller = new CuentasCorrientesController(_context);
-            CuentaCorriente cuenta = new CuentaCorriente()
-            {
-                Fecha = pago.Fecha,
-                PagoId = pago.Id,
-                ClienteId = Convert.ToInt32(pago.ClienteId),
-                Concepto = CuentaCorriente.Conceptos.Haber,
-                Importe = -pago.Importe,
-                Saldo_Parcial = pago.Cliente.Saldo
-            };
-            await controller.Post(cuenta);
-
             return pago.Id;
         }
-
-        public async Task ActualizaCliente(Pago pago, string accion)
-        {
-            ClientesController cliente = new ClientesController(_context);
-            var c = await cliente.Get();
-
-            switch (accion)
-            {
-                case "create":
-                    for (int i = 0; i < c.Value.Count; i++)
-                    {
-                        if (c.Value[i].Id == pago.ClienteId)
-                        {
-                            var newsaldo = c.Value[i].Saldo - pago.Importe;
-
-                            await cliente.PutSaldo(c.Value[i], newsaldo);
-                        }
-                    }
-                    break;
-                case "delete":
-                    for (int i = 0; i < c.Value.Count; i++)
-                    {
-                        if (c.Value[i].Id == pago.ClienteId)
-                        {
-                            var newsaldo = c.Value[i].Saldo + pago.Importe;
-
-                            await cliente.PutSaldo(c.Value[i], newsaldo);
-                        }
-                    }
-                    break;
-            }
-        }
-
 
         // PUT: api/pagos
         [HttpPut]
         public async Task<ActionResult> Put(Pago pago)
         {
             _context.Entry(pago).State = EntityState.Modified;
-
             await _context.SaveChangesAsync();
-
             return Ok();
         }
 
@@ -155,18 +122,22 @@ namespace Proyecto_Vivero.Server.Controllers
         {
             var pago = await _context.Pagos.FirstAsync(x => x.Id == id);
 
-            CuentasCorrientesController controller = new CuentasCorrientesController(_context);
-            await controller.Delete("pago", pago.Id);
+            if (pago != null)
+            {
+                var cliente = await _context.Clientes.FirstAsync(x => x.Id == pago.ClienteId);
+                cliente.Saldo = cliente.Saldo + pago.Importe;
 
-            if (pago == null)
+                ClientesController c = new ClientesController(_context);
+                await c.Put(cliente);
+
+                CuentasCorrientesController controller = new CuentasCorrientesController(_context);
+                await controller.Delete("pago", pago.Id);
+            }
+            else
             {
                 return NotFound();
             }
-
-            await ActualizaCliente(pago, "delete");
-
             _context.Pagos.Remove(pago);
-
             await _context.SaveChangesAsync();
 
             return pago;

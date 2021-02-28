@@ -49,12 +49,11 @@ namespace Proyecto_Vivero.Server.Controllers
             return await _context.Clientes.FirstAsync(x => x.Id == id);
         }
 
-
         // POST: api/clientes 
         [HttpPost]
         public async Task<ActionResult> Post(Cliente cliente)
         {
-            if (!(_context.Clientes.Any(e => e.Dni == cliente.Dni)))
+            if (!Exists(cliente.Dni))
             {
                 _context.Clientes.Add(cliente);
                 await _context.SaveChangesAsync();
@@ -66,22 +65,11 @@ namespace Proyecto_Vivero.Server.Controllers
             }
         }
 
-
         // PUT: api/clientes
         [HttpPut]
         public async Task<ActionResult> Put(Cliente cliente)
         {
             _context.Entry(cliente).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return Ok();
-        }
-
-        // PUT: api/clientes/saldo
-        [HttpPut("saldo")]
-        public async Task<ActionResult> PutSaldo(Cliente cliente, decimal newsaldo)
-        {
-            _context.Entry(cliente).State = EntityState.Modified;
-            cliente.Saldo = newsaldo;
             await _context.SaveChangesAsync();
             return Ok();
         }
@@ -102,9 +90,9 @@ namespace Proyecto_Vivero.Server.Controllers
             return cliente;
         }
 
-        private bool Exists(int id)
+        private bool Exists(string dni)
         {
-            return _context.Clientes.Any(e => e.Id == id);
+            return (_context.Clientes.Any(e => e.Dni == dni));
         }
     }
 }
