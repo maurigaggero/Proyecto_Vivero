@@ -75,23 +75,7 @@ namespace Proyecto_Vivero.Server.Controllers
 
                 await _context.SaveChangesAsync();
 
-                var cliente = await _context.Clientes.FirstAsync(x => x.Id == pago.ClienteId);
-                cliente.Saldo = cliente.Saldo - pago.Importe;
-
-                ClientesController c = new ClientesController(_context);
-                await c.Put(cliente);
-
-                CuentasCorrientesController cc = new CuentasCorrientesController(_context);
-                CuentaCorriente cuenta = new CuentaCorriente()
-                {
-                    Fecha = pago.Fecha,
-                    PagoId = pago.Id,
-                    ClienteId = Convert.ToInt32(pago.ClienteId),
-                    Concepto = CuentaCorriente.Conceptos.Haber,
-                    Importe = pago.Importe,
-                    Saldo_Parcial = pago.Cliente.Saldo
-                };
-                await cc.Post(cuenta);
+                await DecrementaSaldo(pago);
             }
             catch (DbUpdateException)
             {
@@ -124,14 +108,7 @@ namespace Proyecto_Vivero.Server.Controllers
 
             if (pago != null)
             {
-                var cliente = await _context.Clientes.FirstAsync(x => x.Id == pago.ClienteId);
-                cliente.Saldo = cliente.Saldo + pago.Importe;
-
-                ClientesController c = new ClientesController(_context);
-                await c.Put(cliente);
-
-                CuentasCorrientesController controller = new CuentasCorrientesController(_context);
-                await controller.Delete("pago", pago.Id);
+                await IncrementaSaldo(pago);
             }
             else
             {
@@ -146,6 +123,39 @@ namespace Proyecto_Vivero.Server.Controllers
         private bool Exists(int id)
         {
             return _context.Pagos.Any(e => e.Id == id);
+        }
+
+        private async Task DecrementaSaldo(Pago pago)
+        {
+            var cliente = await _context.Clientes.FirstAsync(x => x.Id == pago.ClienteId);
+            cliente.Saldo = cliente.Saldo - pago.Importe;
+
+            ClientesController c = new ClientesController(_context);
+            await c.Put(cliente);
+
+            CuentasCorrientesController cc = new CuentasCorrientesController(_context);
+            CuentaCorriente cuenta = new CuentaCorriente()
+            {
+                Fecha = pago.Fecha,
+                PagoId = pago.Id,
+                ClienteId = Convert.ToInt32(pago.ClienteId),
+                Concepto = CuentaCorriente.Conceptos.Haber,
+                Importe = pago.Importe,
+                Saldo_Parcial = pago.Cliente.Saldo
+            };
+            await cc.Post(cuenta);
+        }
+
+        private async Task IncrementaSaldo(Pago pago)
+        {
+            var cliente = await _context.Clientes.FirstAsync(x => x.Id == pago.ClienteId);
+            cliente.Saldo = cliente.Saldo + pago.Importe;
+
+            ClientesController c = new ClientesController(_context);
+            await c.Put(cliente);
+
+            CuentasCorrientesController controller = new CuentasCorrientesController(_context);
+            await controller.Delete("pago", pago.Id);
         }
     }
 }

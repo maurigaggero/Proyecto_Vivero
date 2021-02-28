@@ -96,7 +96,7 @@ else
                     </td>
                     <td>
                         <input type="checkbox" @bind="pedido.Finalizado"
-                               @onclick="@(() => Finalizado(pedido.Id, pedido.Finalizado))">
+                               @onclick="@(() => Finalizado(pedido))">
                     </td>
                 </tr>
             </Virtualize>
@@ -131,10 +131,10 @@ else
         }
     }
 
-    async Task Finalizado(int idpedido, bool finalizado)
+    async Task Finalizado(Pedido pedido)
     {
-        var pedido = pedidos.FirstOrDefault(x => x.Id == idpedido);
-        await Http.PutAsJsonAsync($"api/pedidos/finalizado/{!finalizado}", pedido);
+        pedido.Finalizado = !pedido.Finalizado;
+        await Http.PutAsJsonAsync($"api/pedidos", pedido);
         await CargarPedidos();
     }
 

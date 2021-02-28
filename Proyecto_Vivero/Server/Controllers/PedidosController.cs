@@ -67,7 +67,6 @@ namespace Proyecto_Vivero.Server.Controllers
                 .FirstAsync(x => x.Id == id);
         }
 
-
         // POST: api/pedidos 
         [HttpPost]
         public async Task<ActionResult> Post(Pedido pedido)
@@ -92,15 +91,13 @@ namespace Proyecto_Vivero.Server.Controllers
             return Ok();
         }
 
-
         // PUT: api/pedidos
         [HttpPut]
         public async Task<ActionResult> Put(Pedido pedido)
         {
-
             _context.Entry(pedido).State = EntityState.Modified;
-
             pedido.Fecha = DateTime.Now;
+
             foreach (var detalle in pedido.DetallePedidos)
             {
                 if (detalle.Id != 0)
@@ -122,17 +119,6 @@ namespace Proyecto_Vivero.Server.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok();
-        }
-
-        // PUT: api/pedidos/finalizado
-        [HttpPut("finalizado/{finalizado}")]
-        public async Task<ActionResult> PutFinalizado(Pedido pedido, bool finalizado)
-        {
-
-            _context.Entry(pedido).State = EntityState.Modified;
-            pedido.Finalizado = finalizado;
-            await _context.SaveChangesAsync();
             return Ok();
         }
 
