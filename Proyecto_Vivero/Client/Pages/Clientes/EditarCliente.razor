@@ -22,37 +22,42 @@
 @if (cuenta.Count != 0)
 {
     <hr />
-    <table class="table table-hover m-1">
-        <thead class="thead-dark">
-            <tr>
-                <th>Comprobante</th>
-                <th>Fecha</th>
-                <th>Concepto</th>
-                <th>Importe</th>
-                <th>Saldo Parcial</th>
-            </tr>
-        </thead>
-        <tbody>
-            <Virtualize Items="@cuenta" Context="cuenta">
-                <tr @key="cuenta.Id">
-                    <td>
-                        @if (cuenta.PagoId == null)
-                        {
-                            <a href="ver-venta/@cuenta.VentaId" class="btn btn-sm btn-primary">Ver</a>
-                        }
-                        @if (cuenta.VentaId == null)
-                        {
-                            <a href="ver-pago/@cuenta.PagoId" class="btn btn-sm btn-primary">Ver</a>
-                        }
-                    </td>
-                    <td>@cuenta.Fecha</td>
-                    <td>@cuenta.Concepto</td>
-                    <td><b>@cuenta.Importe</b></td>
-                    <td>@cuenta.Saldo_Parcial</td>
-                </tr>
-            </Virtualize>
-        </tbody>
-    </table>
+    <div class="card">
+        <div class="card-body">
+            <h3 class="m-1">Movimientos</h3>
+            <table class="table table-hover m-1">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Comprobante</th>
+                        <th>Fecha</th>
+                        <th>Concepto</th>
+                        <th>Importe</th>
+                        <th>Saldo Parcial</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <Virtualize Items="@cuenta" Context="cuenta">
+                        <tr @key="cuenta.Id">
+                            <td>
+                                @if (cuenta.PagoId == null)
+                                {
+                                    <a href="ver-venta/@cuenta.VentaId" class="btn btn-sm btn-primary">Ver</a>
+                                }
+                                @if (cuenta.VentaId == null)
+                                {
+                                    <a href="ver-pago/@cuenta.PagoId" class="btn btn-sm btn-primary">Ver</a>
+                                }
+                            </td>
+                            <td>@cuenta.Fecha</td>
+                            <td>@cuenta.Concepto</td>
+                            <td><b>@cuenta.Importe</b></td>
+                            <td>@cuenta.Saldo_Parcial</td>
+                        </tr>
+                    </Virtualize>
+                </tbody>
+            </table>
+        </div>
+    </div>
     <hr />
 }
 
