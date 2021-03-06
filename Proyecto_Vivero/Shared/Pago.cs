@@ -13,7 +13,6 @@ namespace Proyecto_Vivero.Shared
     {
         #region ATRIBUTOS/PROPIEDADES
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public DateTime Fecha { get; set; }
         [Required]

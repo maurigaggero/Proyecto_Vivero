@@ -12,7 +12,6 @@ namespace Proyecto_Vivero.Shared
     {
         #region ATRIBUTOS/PROPIEDADES
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         [Required]
         public string NombreyApellido { get; set; }

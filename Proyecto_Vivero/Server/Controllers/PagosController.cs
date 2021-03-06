@@ -17,18 +17,18 @@ namespace Proyecto_Vivero.Server.Controllers
     [ApiController]
     public class PagosController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext context;
 
         public PagosController(ApplicationDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         //GET: api/pagos
         [HttpGet]
         public async Task<ActionResult<List<Pago>>> Get()
         {
-            return await _context.Pagos.Include(x => x.Cliente)
+            return await context.Pagos.Include(x => x.Cliente)
                 .Include(x => x.ApplicationUser)
                 .Include(x => x.Cliente)
                 .ToListAsync();
@@ -40,7 +40,7 @@ namespace Proyecto_Vivero.Server.Controllers
         {
             DateTime f = Convert.ToDateTime(fecha);
 
-            var queryable = _context.Pagos.Include(x => x.Cliente)
+            var queryable = context.Pagos.Include(x => x.Cliente)
                 .Include(x => x.ApplicationUser)
                 .AsQueryable();
 
@@ -57,7 +57,7 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Pago>> Get(int id)
         {
-            return await _context.Pagos.Include(x => x.Cliente)
+            return await context.Pagos.Include(x => x.Cliente)
                 .Include(x => x.ApplicationUser)
                 .FirstAsync(x => x.Id == id);
         }
@@ -66,14 +66,14 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<int>> Post(Pago pago)
         {
-            _context.Pagos.Add(pago);
+            context.Pagos.Add(pago);
             try
             {
                 var userid = User.GetUserId();
                 pago.EmpleadoId = userid;
                 pago.Fecha = DateTime.Now;
 
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
 
                 await DecrementaSaldo(pago);
             }
@@ -95,8 +95,8 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpPut]
         public async Task<ActionResult> Put(Pago pago)
         {
-            _context.Entry(pago).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            context.Entry(pago).State = EntityState.Modified;
+            await context.SaveChangesAsync();
             return Ok();
         }
 
@@ -104,7 +104,7 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Pago>> Delete(int id)
         {
-            var pago = await _context.Pagos.FirstAsync(x => x.Id == id);
+            var pago = await context.Pagos.FirstAsync(x => x.Id == id);
 
             if (pago != null)
             {
@@ -114,33 +114,33 @@ namespace Proyecto_Vivero.Server.Controllers
             {
                 return NotFound();
             }
-            _context.Pagos.Remove(pago);
-            await _context.SaveChangesAsync();
+            context.Pagos.Remove(pago);
+            await context.SaveChangesAsync();
 
             return pago;
         }
 
         private bool Exists(int id)
         {
-            return _context.Pagos.Any(e => e.Id == id);
+            return context.Pagos.Any(e => e.Id == id);
         }
 
         private async Task DecrementaSaldo(Pago pago)
         {
-            var cliente = await _context.Clientes.FirstAsync(x => x.Id == pago.ClienteId);
+            var cliente = await context.Clientes.FirstAsync(x => x.Id == pago.ClienteId);
             cliente.Saldo = cliente.Saldo - pago.Importe;
 
-            ClientesController c = new ClientesController(_context);
+            ClientesController c = new ClientesController(context);
             await c.Put(cliente);
 
-            CuentasCorrientesController cc = new CuentasCorrientesController(_context);
+            CuentasCorrientesController cc = new CuentasCorrientesController(context);
             CuentaCorriente cuenta = new CuentaCorriente()
             {
                 Fecha = pago.Fecha,
                 PagoId = pago.Id,
                 ClienteId = Convert.ToInt32(pago.ClienteId),
                 Concepto = CuentaCorriente.Conceptos.Haber,
-                Importe = pago.Importe,
+                Importe = -pago.Importe,
                 Saldo_Parcial = pago.Cliente.Saldo
             };
             await cc.Post(cuenta);
@@ -148,13 +148,13 @@ namespace Proyecto_Vivero.Server.Controllers
 
         private async Task IncrementaSaldo(Pago pago)
         {
-            var cliente = await _context.Clientes.FirstAsync(x => x.Id == pago.ClienteId);
+            var cliente = await context.Clientes.FirstAsync(x => x.Id == pago.ClienteId);
             cliente.Saldo = cliente.Saldo + pago.Importe;
 
-            ClientesController c = new ClientesController(_context);
+            ClientesController c = new ClientesController(context);
             await c.Put(cliente);
 
-            CuentasCorrientesController controller = new CuentasCorrientesController(_context);
+            CuentasCorrientesController controller = new CuentasCorrientesController(context);
             await controller.Delete("pago", pago.Id);
         }
     }

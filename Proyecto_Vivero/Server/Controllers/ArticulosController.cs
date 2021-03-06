@@ -16,25 +16,25 @@ namespace Proyecto_Vivero.Server.Controllers
     [ApiController]
     public class ArticulosController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext context;
 
         public ArticulosController(ApplicationDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         //GET: api/articulos
         [HttpGet]
         public async Task<ActionResult<List<Articulo>>> Get()
         {
-            return await _context.Articulos.OrderBy(x => x.Nombre).ToListAsync();
+            return await context.Articulos.OrderBy(x => x.Nombre).ToListAsync();
         }
 
         //GET: api/articulos/filtro/nombre
         [HttpGet("filtro")]
         public async Task<ActionResult<List<Articulo>>> Get([FromQuery] string nombre)
         {
-            var queryable = _context.Articulos.OrderBy(x => x.Nombre).AsQueryable();
+            var queryable = context.Articulos.OrderBy(x => x.Nombre).AsQueryable();
             if (!string.IsNullOrEmpty(nombre))
             {
                 queryable = queryable.Where(x => x.Nombre.Contains(nombre));
@@ -46,18 +46,18 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Articulo>> Get(int id)
         {
-            return await _context.Articulos.FirstAsync(x => x.Id == id);
+            return await context.Articulos.FirstAsync(x => x.Id == id);
         }
 
         // POST: api/articulos 
         [HttpPost]
         public async Task<ActionResult> Post(Articulo articulo)
         {
-            _context.Articulos.Add(articulo);
+            context.Articulos.Add(articulo);
             try
             {
                 articulo.Ultima_Modificación = DateTime.Now;
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
@@ -77,9 +77,9 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpPut]
         public async Task<ActionResult> Put(Articulo articulo)
         {
-            _context.Entry(articulo).State = EntityState.Modified;
+            context.Entry(articulo).State = EntityState.Modified;
             articulo.Ultima_Modificación = DateTime.Now;
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             return Ok();
         }
 
@@ -87,21 +87,21 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Articulo>> Delete(int id)
         {
-            var articulo = await _context.Articulos.FindAsync(id);
+            var articulo = await context.Articulos.FindAsync(id);
             if (articulo == null)
             {
                 return NotFound();
             }
 
-            _context.Articulos.Remove(articulo);
-            await _context.SaveChangesAsync();
+            context.Articulos.Remove(articulo);
+            await context.SaveChangesAsync();
 
             return articulo;
         }
 
         private bool Exists(int id)
         {
-            return _context.Articulos.Any(e => e.Id == id);
+            return context.Articulos.Any(e => e.Id == id);
         }
     }
 }

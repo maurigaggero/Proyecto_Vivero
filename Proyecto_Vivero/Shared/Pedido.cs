@@ -12,7 +12,6 @@ namespace Proyecto_Vivero.Shared
     {
         #region ATRIBUTOS/PROPIEDADES
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         [Required]
         [Range(1, 99999999, ErrorMessage = "Seleccione cliente")]
@@ -32,7 +31,6 @@ namespace Proyecto_Vivero.Shared
     {
         #region ATRIBUTOS/PROPIEDADES
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         [Required]
         public int ArticuloId { get; set; }

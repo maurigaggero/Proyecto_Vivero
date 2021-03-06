@@ -50,7 +50,14 @@
                             </td>
                             <td>@cuenta.Fecha</td>
                             <td>@cuenta.Concepto</td>
-                            <td><b>@cuenta.Importe</b></td>
+                            @if (cuenta.Concepto == CuentaCorriente.Conceptos.Debe)
+                            {
+                                <td><b>+@cuenta.Importe</b></td>
+                            }
+                            else
+                            {
+                                <td><b>@cuenta.Importe</b></td>
+                            }
                             <td>@cuenta.Saldo_Parcial</td>
                         </tr>
                     </Virtualize>

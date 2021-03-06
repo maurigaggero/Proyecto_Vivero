@@ -10,7 +10,7 @@ using Proyecto_Vivero.Server.Data;
 namespace Proyecto_Vivero.Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210225234001_new")]
+    [Migration("20210306180719_new")]
     partial class @new
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

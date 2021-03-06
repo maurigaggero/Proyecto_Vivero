@@ -16,25 +16,25 @@ namespace Proyecto_Vivero.Server.Controllers
     [ApiController]
     public class ClientesController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext context;
 
         public ClientesController(ApplicationDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         //GET: api/clientes
         [HttpGet]
         public async Task<ActionResult<List<Cliente>>> Get()
         {
-            return await _context.Clientes.OrderBy(x => x.NombreyApellido).ToListAsync();
+            return await context.Clientes.OrderBy(x => x.NombreyApellido).ToListAsync();
         }
 
         //GET: api/clientes/filtro/nombre
         [HttpGet("filtro")]
         public async Task<ActionResult<List<Cliente>>> Get([FromQuery] string nombre)
         {
-            var queryable = _context.Clientes.OrderBy(x => x.NombreyApellido).AsQueryable();
+            var queryable = context.Clientes.OrderBy(x => x.NombreyApellido).AsQueryable();
             if (!string.IsNullOrEmpty(nombre))
             {
                 queryable = queryable.Where(x => x.NombreyApellido.Contains(nombre));
@@ -46,7 +46,7 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Cliente>> Get(int id)
         {
-            return await _context.Clientes.FirstAsync(x => x.Id == id);
+            return await context.Clientes.FirstAsync(x => x.Id == id);
         }
 
         // POST: api/clientes 
@@ -55,8 +55,8 @@ namespace Proyecto_Vivero.Server.Controllers
         {
             if (!Exists(cliente.Dni))
             {
-                _context.Clientes.Add(cliente);
-                await _context.SaveChangesAsync();
+                context.Clientes.Add(cliente);
+                await context.SaveChangesAsync();
                 return Ok();
             }
             else
@@ -69,8 +69,8 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpPut]
         public async Task<ActionResult> Put(Cliente cliente)
         {
-            _context.Entry(cliente).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            context.Entry(cliente).State = EntityState.Modified;
+            await context.SaveChangesAsync();
             return Ok();
         }
 
@@ -78,21 +78,21 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Cliente>> Delete(int id)
         {
-            var cliente = await _context.Clientes.FindAsync(id);
+            var cliente = await context.Clientes.FindAsync(id);
             if (cliente == null)
             {
                 return NotFound();
             }
 
-            _context.Clientes.Remove(cliente);
-            await _context.SaveChangesAsync();
+            context.Clientes.Remove(cliente);
+            await context.SaveChangesAsync();
 
             return cliente;
         }
 
         private bool Exists(string dni)
         {
-            return (_context.Clientes.Any(e => e.Dni == dni));
+            return (context.Clientes.Any(e => e.Dni == dni));
         }
     }
 }

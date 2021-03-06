@@ -16,32 +16,32 @@ namespace Proyecto_Vivero.Server.Controllers
     [ApiController]
     public class CuentasCorrientesController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext context;
 
         public CuentasCorrientesController(ApplicationDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         //GET: api/cuentascorrientes
         [HttpGet]
         public async Task<ActionResult<List<CuentaCorriente>>> Get()
         {
-            return await _context.CuentasCorrientes.OrderByDescending(x => x.Fecha).ToListAsync();
+            return await context.CuentasCorrientes.OrderByDescending(x => x.Fecha).ToListAsync();
         }
 
         // GET: api/cuentascorrientes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<CuentaCorriente>> Get(int id)
         {
-            return await _context.CuentasCorrientes.FirstAsync(x => x.Id == id);
+            return await context.CuentasCorrientes.FirstAsync(x => x.Id == id);
         }
 
         // GET: api/cuentascorrientes/porcliente/5
         [HttpGet("porcliente/{idcliente}")]
         public async Task<ActionResult<List<CuentaCorriente>>> GetPorCliente(int idcliente)
         {
-            return await _context.CuentasCorrientes.Where(x => x.ClienteId == idcliente)
+            return await context.CuentasCorrientes.Where(x => x.ClienteId == idcliente)
                 .OrderByDescending(x => x.Fecha).ToListAsync();
         }
 
@@ -49,10 +49,10 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpPost]
         public async Task<ActionResult> Post(CuentaCorriente cuenta)
         {
-            _context.CuentasCorrientes.Add(cuenta);
+            context.CuentasCorrientes.Add(cuenta);
             try
             {
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
@@ -73,8 +73,8 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpPut]
         public async Task<ActionResult> Put(CuentaCorriente cuenta)
         {
-            _context.Entry(cuenta).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            context.Entry(cuenta).State = EntityState.Modified;
+            await context.SaveChangesAsync();
             return Ok();
         }
 
@@ -86,12 +86,12 @@ namespace Proyecto_Vivero.Server.Controllers
 
             if (borrar == "pago")
             {
-                cuenta = await _context.CuentasCorrientes.FirstAsync(x => x.PagoId == id);
+                cuenta = await context.CuentasCorrientes.FirstAsync(x => x.PagoId == id);
 
             }
             if (borrar == "venta")
             {
-                cuenta = await _context.CuentasCorrientes.FirstAsync(x => x.VentaId == id);
+                cuenta = await context.CuentasCorrientes.FirstAsync(x => x.VentaId == id);
             }
 
             if (cuenta == null)
@@ -99,15 +99,15 @@ namespace Proyecto_Vivero.Server.Controllers
                 return NotFound();
             }
 
-            _context.CuentasCorrientes.Remove(cuenta);
-            await _context.SaveChangesAsync();
+            context.CuentasCorrientes.Remove(cuenta);
+            await context.SaveChangesAsync();
 
             return cuenta;
         }
 
         private bool Exists(int id)
         {
-            return _context.CuentasCorrientes.Any(e => e.Id == id);
+            return context.CuentasCorrientes.Any(e => e.Id == id);
         }
     }
 }

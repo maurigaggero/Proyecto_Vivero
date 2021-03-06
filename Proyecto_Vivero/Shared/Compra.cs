@@ -13,7 +13,6 @@ namespace Proyecto_Vivero.Shared
     {
         #region ATRIBUTOS/PROPIEDADES
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public DateTime Fecha { get; set; }
         public List<DetalleCompra> DetalleCompras { get; set; } = new List<DetalleCompra>();
@@ -30,7 +29,6 @@ namespace Proyecto_Vivero.Shared
     {
         #region ATRIBUTOS/PROPIEDADES
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         [Required]
         public int ArticuloId { get; set; }

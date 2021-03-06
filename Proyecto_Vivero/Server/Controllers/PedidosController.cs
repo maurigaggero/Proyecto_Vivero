@@ -16,18 +16,18 @@ namespace Proyecto_Vivero.Server.Controllers
     [ApiController]
     public class PedidosController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext context;
 
         public PedidosController(ApplicationDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         //GET: api/pedidos
         [HttpGet]
         public async Task<ActionResult<List<Pedido>>> Get()
         {
-            return await _context.Pedidos
+            return await context.Pedidos
                 .Include(x => x.Cliente)
                 .Include(x => x.DetallePedidos)
                 .ThenInclude(x => x.Articulo)
@@ -38,7 +38,7 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpGet("filtro")]
         public async Task<ActionResult<List<Pedido>>> Get([FromQuery] string cliente, [FromQuery] string articulo)
         {
-            var queryable = _context.Pedidos
+            var queryable = context.Pedidos
                 .Include(x => x.Cliente)
                 .Include(x => x.DetallePedidos)
                 .ThenInclude(x => x.Articulo).AsQueryable();
@@ -60,7 +60,7 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Pedido>> Get(int id)
         {
-            return await _context.Pedidos
+            return await context.Pedidos
                 .Include(x => x.Cliente)
                 .Include(x => x.DetallePedidos)
                 .ThenInclude(x => x.Articulo)
@@ -71,11 +71,11 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpPost]
         public async Task<ActionResult> Post(Pedido pedido)
         {
-            _context.Pedidos.Add(pedido);
+            context.Pedidos.Add(pedido);
             try
             {
                 pedido.Fecha = DateTime.Now;
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
@@ -95,29 +95,29 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpPut]
         public async Task<ActionResult> Put(Pedido pedido)
         {
-            _context.Entry(pedido).State = EntityState.Modified;
+            context.Entry(pedido).State = EntityState.Modified;
             pedido.Fecha = DateTime.Now;
 
             foreach (var detalle in pedido.DetallePedidos)
             {
                 if (detalle.Id != 0)
                 {
-                    _context.Entry(detalle).State = EntityState.Modified;
+                    context.Entry(detalle).State = EntityState.Modified;
                 }
                 else
                 {
-                    _context.Entry(detalle).State = EntityState.Added;
+                    context.Entry(detalle).State = EntityState.Added;
                 }
             }
             var listadodetalle_ids = pedido.DetallePedidos.Select(x => x.Id).ToList();
-            var detallesborrar = await _context
+            var detallesborrar = await context
                 .DetallePedidos
                 .Where(x => !listadodetalle_ids.Contains(x.Id) && x.PedidoId == pedido.Id)
                 .ToListAsync();
 
-            _context.RemoveRange(detallesborrar);
+            context.RemoveRange(detallesborrar);
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             return Ok();
         }
@@ -126,21 +126,21 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Pedido>> Delete(int id)
         {
-            var pedido = await _context.Pedidos.FindAsync(id);
+            var pedido = await context.Pedidos.FindAsync(id);
             if (pedido == null)
             {
                 return NotFound();
             }
 
-            _context.Pedidos.Remove(pedido);
-            await _context.SaveChangesAsync();
+            context.Pedidos.Remove(pedido);
+            await context.SaveChangesAsync();
 
             return pedido;
         }
 
         private bool Exists(int id)
         {
-            return _context.Pedidos.Any(e => e.Id == id);
+            return context.Pedidos.Any(e => e.Id == id);
         }
     }
 }

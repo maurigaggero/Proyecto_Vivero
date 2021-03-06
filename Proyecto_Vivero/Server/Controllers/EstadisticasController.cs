@@ -15,11 +15,11 @@ namespace Proyecto_Vivero.Server.Controllers
     [ApiController]
     public class EstadisticasController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext context;
 
         public EstadisticasController(ApplicationDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         ////GET: api/estadisticas/ejercicio/
@@ -32,10 +32,10 @@ namespace Proyecto_Vivero.Server.Controllers
 
             for (int i = 1; i < meses.Length; i++)
             {
-                meses[i-1] = _context.Ventas
+                meses[i-1] = context.Ventas
                 .Where(x => x.Fecha.Date.Month == i && x.Fecha.Date.Year == año
                        && x.FormaPago != FormasPago.CuentaCorriente)
-                .Sum(x => x.Total) + _context.Pagos
+                .Sum(x => x.Total) + context.Pagos
                 .Where(x => x.Fecha.Date.Month == i && x.Fecha.Date.Year == año)
                 .Sum(x => x.Importe);
             }
@@ -52,7 +52,7 @@ namespace Proyecto_Vivero.Server.Controllers
 
             for (int i = 1; i < meses.Length; i++)
             {
-                meses[i-1] = _context.Ventas
+                meses[i-1] = context.Ventas
                 .Where(x => x.Fecha.Date.Month == i && x.Fecha.Date.Year == año)
                 .Count();
             }
@@ -63,7 +63,7 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpGet("pendientes")]
         public async Task<ActionResult<int>> GetPedidosPendientes()
         {
-            return await _context.Pedidos.Where(x => x.Finalizado == false).CountAsync();
+            return await context.Pedidos.Where(x => x.Finalizado == false).CountAsync();
         }
     }
 }

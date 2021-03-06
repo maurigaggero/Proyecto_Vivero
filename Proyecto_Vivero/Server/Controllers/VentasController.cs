@@ -17,18 +17,18 @@ namespace Proyecto_Vivero.Server.Controllers
     [ApiController]
     public class VentasController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext context;
 
         public VentasController(ApplicationDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         //GET: api/ventas
         [HttpGet]
         public async Task<ActionResult<List<Venta>>> Get()
         {
-            return await _context.Ventas.Include(x => x.Cliente)
+            return await context.Ventas.Include(x => x.Cliente)
                 .Include(x => x.ApplicationUser)
                 .Include(x => x.DetalleVentas)
                 .ThenInclude(x => x.Articulo)
@@ -41,7 +41,7 @@ namespace Proyecto_Vivero.Server.Controllers
         {
             DateTime f = Convert.ToDateTime(fecha);
 
-            var queryable = _context.Ventas.Include(x => x.Cliente)
+            var queryable = context.Ventas.Include(x => x.Cliente)
                 .Include(x => x.ApplicationUser)
                 .Include(x => x.DetalleVentas)
                 .ThenInclude(x => x.Articulo).AsQueryable();
@@ -63,7 +63,7 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Venta>> Get(int id)
         {
-            return await _context.Ventas.Include(x => x.Cliente)
+            return await context.Ventas.Include(x => x.Cliente)
                 .Include(x => x.ApplicationUser)
                 .Include(x => x.DetalleVentas)
                 .ThenInclude(x => x.Articulo)
@@ -74,13 +74,13 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<int>> Post(Venta venta)
         {
-            _context.Ventas.Add(venta);
+            context.Ventas.Add(venta);
             try
             {
                 var userid = User.GetUserId();
                 venta.EmpleadoId = userid;
                 venta.Fecha = DateTime.Now;
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
 
                 await DecrementaStock(venta);
 
@@ -107,7 +107,7 @@ namespace Proyecto_Vivero.Server.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Venta>> Delete(int id)
         {
-            var venta = await _context.Ventas.Include(x => x.DetalleVentas)
+            var venta = await context.Ventas.Include(x => x.DetalleVentas)
                 .FirstAsync(x => x.Id == id);
 
             if (venta != null)
@@ -118,8 +118,8 @@ namespace Proyecto_Vivero.Server.Controllers
                 }
                 await IncrementaStock(venta);
 
-                _context.Ventas.Remove(venta);
-                await _context.SaveChangesAsync();
+                context.Ventas.Remove(venta);
+                await context.SaveChangesAsync();
 
                 return venta;
             }
@@ -131,19 +131,19 @@ namespace Proyecto_Vivero.Server.Controllers
 
         private bool Exists(int id)
         {
-            return _context.Ventas.Any(e => e.Id == id);
+            return context.Ventas.Any(e => e.Id == id);
 
         }
 
         private async Task IncrementaSaldo(Venta venta)
         {
-            var cliente = await _context.Clientes.FirstAsync(x => x.Id == venta.ClienteId);
+            var cliente = await context.Clientes.FirstAsync(x => x.Id == venta.ClienteId);
             cliente.Saldo = cliente.Saldo + venta.Total;
 
-            ClientesController c = new ClientesController(_context);
+            ClientesController c = new ClientesController(context);
             await c.Put(cliente);
 
-            CuentasCorrientesController cc = new CuentasCorrientesController(_context);
+            CuentasCorrientesController cc = new CuentasCorrientesController(context);
             CuentaCorriente cuenta = new CuentaCorriente()
             {
                 Fecha = venta.Fecha,
@@ -158,20 +158,20 @@ namespace Proyecto_Vivero.Server.Controllers
 
         private async Task DecrementaSaldo(Venta venta)
         {
-            var cliente = await _context.Clientes.FirstAsync(x => x.Id == venta.ClienteId);
+            var cliente = await context.Clientes.FirstAsync(x => x.Id == venta.ClienteId);
             cliente.Saldo = cliente.Saldo - venta.Total;
 
-            ClientesController c = new ClientesController(_context);
+            ClientesController c = new ClientesController(context);
             await c.Put(cliente);
 
-            CuentasCorrientesController cc = new CuentasCorrientesController(_context);
+            CuentasCorrientesController cc = new CuentasCorrientesController(context);
             await cc.Delete("venta", venta.Id);
         }
 
         private async Task DecrementaStock(Venta venta)
         {
-            var lista_articulo = await _context.Articulos.ToListAsync();
-            ArticulosController articulos = new ArticulosController(_context);
+            var lista_articulo = await context.Articulos.ToListAsync();
+            ArticulosController articulos = new ArticulosController(context);
 
             foreach (var detalle in venta.DetalleVentas)
             {
@@ -183,9 +183,9 @@ namespace Proyecto_Vivero.Server.Controllers
 
         private async Task IncrementaStock(Venta venta)
         {
-            var lista_articulo = await _context.Articulos.ToListAsync();
+            var lista_articulo = await context.Articulos.ToListAsync();
 
-            ArticulosController articulos = new ArticulosController(_context);
+            ArticulosController articulos = new ArticulosController(context);
             foreach (var detalle in venta.DetalleVentas)
             {
                 var articulo = lista_articulo.First(x => x.Id == detalle.ArticuloId);
