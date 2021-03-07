@@ -1,10 +1,8 @@
 ﻿@using Proyecto_Vivero.Shared
 @inject NavigationManager NavigationManager
-@inject HttpClient Http
-@inject IJSRuntime JS
 
 <EditForm Model="@pago" OnValidSubmit="OnValidSubmit">
-    <div class="form-field m-2">
+    <div class="form-field mt-2 mb-2">
         <div class="form-group row">
             <label class="col-3 col-form-label">Cliente</label>
             <div class="col">
@@ -49,25 +47,20 @@
             </div>
         </div>
 
-        <div class="form-group">
-            <div class="d-flex justify-content-center">
-                <div class="btn-group btn-block">
-                    <button type="submit" class="btn btn-success"><i class="oi oi-check"></i><text style="color:white"> @textSubmit</text></button>
-                    <button @onclick="@Volver" class="btn btn-danger"><i class="oi oi-x"></i><text style="color:white"> Cancelar y volver atrás</text></button>
-                </div>
-            </div>
+        <div class="btn-group btn-block">
+            <button type="submit" class="btn btn-success"><i class="oi oi-check"></i><text style="color:white"> @textSubmit</text></button>
+            <button @onclick="@Volver" class="btn btn-danger"><i class="oi oi-x"></i><text style="color:white"> Cancelar y volver atrás</text></button>
         </div>
     </div>
     <DataAnnotationsValidator />
 </EditForm>
-
 
 @code {
     [Parameter] public Pago pago { get; set; } = new Pago();
     [Parameter] public List<Cliente> clientes { get; set; } = new List<Cliente>();
     [Parameter] public EventCallback OnValidSubmit { get; set; }
 
-    [Parameter] public string textSubmit { get; set; } = "Finalizar Venta";
+    [Parameter] public string textSubmit { get; set; }
 
     void Volver()
     {

@@ -9,10 +9,19 @@
 
 @using Proyecto_Vivero.Shared
 
-<h2><b>Editar pedido</b></h2>
+<div class="d-flex justify-content-between mb-3">
+    <div>
+        <button @onclick="@Volver" class="btn btn-sm btn-secondary">
+            <i class="oi oi-arrow-circle-left"></i> Volver al listado
+        </button>
+    </div>
+    <div>
+        <h3><b>Editar pedido</b></h3>
+    </div>
+</div>
 
-<ComponenteFormPedidos textSubmit=" Guardar Pedido" OnValidSubmit="EditPedido"
-                       pedido="pedido" clientes="clientes" articulos="articulos"></ComponenteFormPedidos>
+<FormPedidos textSubmit=" Guardar cambios" OnValidSubmit="EditPedido"
+                       pedido="pedido" clientes="clientes" articulos="articulos"></FormPedidos>
 
 @code {
     public Pedido pedido = new Pedido();
@@ -47,5 +56,10 @@
                     $"No se pudo editar pedido", "error");
             }
         }
+    }
+
+    void Volver()
+    {
+        NavigationManager.NavigateTo("/lista-pedidos");
     }
 }

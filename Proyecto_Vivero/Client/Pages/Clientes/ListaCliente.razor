@@ -9,7 +9,7 @@
 @using System.Text.Json
 @using Proyecto_Vivero.Shared
 
-<div class="d-flex position-sticky justify-content-between m-1">
+<div class="d-flex position-sticky justify-content-between">
     <div class="btn-group mr-2">
         <button @onclick="CrearCliente" class="btn btn-success"><i class="oi oi-plus"></i> Agregar cliente</button>
     </div>
@@ -22,8 +22,8 @@
     </div>
 </div>
 
-<div class="d-flex justify-content-between">
-    <div class="form-inline m-1">
+<div class="d-flex justify-content-between mt-2 mb-2">
+    <div class="btn-group">
         <button @onclick="MostrarTodos" style="background:none; border: none">
             <b>Ver todos</b>
         </button>
@@ -32,7 +32,7 @@
         </button>
     </div>
 
-    <div class="m-1">
+    <div class="btn-group">
         <button @onclick="CambiarVista" style="background:none; border: none">
             <b>Cambiar vista</b>
         </button>
@@ -59,7 +59,7 @@ else
         @foreach (var cliente in clientes)
         {
             <a href="/editar-cliente/@cliente.Id" style="color: inherit">
-                <div class="card" style="background-color:lightblue; border-style:groove; border-radius:12px;">
+                <div class="card" style="background-color:lightblue; border-style:groove; border-radius:8px;">
                     @if (cliente.Sexo == Cliente.Sexos.Masculino)
                     {
                         <img class="card-img-top" src="img/masculino.png" alt="Cliente" />

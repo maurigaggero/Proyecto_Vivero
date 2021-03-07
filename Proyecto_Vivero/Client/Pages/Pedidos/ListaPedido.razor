@@ -10,7 +10,7 @@
 @using System.Text.Json
 @using Proyecto_Vivero.Shared
 
-<div class="d-flex position-sticky justify-content-between m-1">
+<div class="d-flex position-sticky justify-content-between mb-1">
     <div class="btn-group mr-2">
         <button @onclick="NuevoPedido" class="btn btn-success"><i class="oi oi-plus"></i> Nuevo pedido</button>
     </div>
@@ -24,8 +24,8 @@
     </div>
 </div>
 
-<div class="d-flex justify-content-start">
-    <div class="form-inline m-1">
+<div class="d-flex justify-content-start mt-2 mb-2">
+    <div class="btn-group">
         <button @onclick="MostrarTodos" style="background:none; border: none">
             <b>Ver todos</b>
         </button>
@@ -74,8 +74,8 @@ else
                     <td><b>@pedido.Fecha</b></td>
                     <td>$@pedido.Seña</td>
                     <td>
-                        <button @onclick="OcultaDetalle" class="btn btn-sm btn-outline-secondary">Mostrar</button>
-                        <button @onclick="MuestraDetalle" class="btn btn-sm btn-outline-success">Ocultar</button>
+                        <button @onclick="MuestraDetalle" class="btn btn-sm btn-outline-success">Mostrar</button>
+                        <button @onclick="OcultaDetalle" class="btn btn-sm btn-outline-secondary">Ocultar</button>
                         <table hidden="@oculto" class="table table-sm">
                             <thead class="thead-light">
                                 <tr>
@@ -140,12 +140,12 @@ else
 
     void MuestraDetalle()
     {
-        oculto = true;
+        oculto = false;
     }
 
     void OcultaDetalle()
     {
-        oculto = false;
+        oculto = true;
     }
 
     async Task MostrarTodos()

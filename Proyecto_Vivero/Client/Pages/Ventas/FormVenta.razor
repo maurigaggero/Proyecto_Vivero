@@ -3,7 +3,7 @@
 @inject HttpClient Http
 
 <EditForm Model="@venta" OnValidSubmit="OnValidSubmit">
-    <div class="form-field m-2">
+    <div class="form-field mt-2 mb-2">
         <div class="form-group row">
             <label class="col-3 col-form-label">Forma de Pago</label>
             <div class="col">
@@ -57,12 +57,10 @@
                 var detalle = venta.DetalleVentas[i];
                 listadetalle = venta.DetalleVentas;
 
-                <div class="d-flex justify-content-between">
-                    <h5>Ítem #@(i + 1)</h5>
-                </div>
+                <h5>Ítem #@(i + 1)</h5>
 
-                <div class="card m-1" style="background-color:lightgrey;border-radius:1rem">
-                    <div class="row m-1">
+                <div class="card mb-2" style="background-color:lightgrey;border-radius:0.5rem">
+                    <div class="row">
                         <div class="col-12 form-group">
                             <div class="d-flex justify-content-between align-items-center m-1">
                                 <label>Artículo</label>
@@ -84,7 +82,7 @@
                         </div>
                     </div>
 
-                    <div class="row mb-1 mr-1 ml-1">
+                    <div class="row">
                         <div class="col-4 form-group">
                             <label>Cantidad</label>
                             @foreach (var art in articulos)
@@ -121,14 +119,14 @@
                 </div>
             }
 
-            <div class="form-group m-2">
+            <div class="btn-group">
                 <button type="button" class="btn btn-success"
                         @onclick="@(() => venta.DetalleVentas.Add(new DetalleVenta()))">
                     Agregar ítem
                 </button>
             </div>
 
-            <div class="d-flex justify-content-end m-2">
+            <div class="d-flex justify-content-end">
                 <button @onclick="@(() => CalcularTotal())" type="button" class="btn btn-light">
                     <h4><b>TOTAL</b></h4>
                     @if (venta.Total != 0)
@@ -138,11 +136,9 @@
                 </button>
             </div>
 
-            <div class="d-flex justify-content-center">
-                <div class="btn-group btn-block">
-                    <button @onclick="@(() => CalcularTotal())" type="submit" class="btn btn-success"><i class="oi oi-check"></i><text style="color:white"> @textSubmit</text></button>
-                    <button @onclick="@Volver" class="btn btn-danger"><i class="oi oi-x"></i><text style="color:white"> Cancelar y volver atrás</text></button>
-                </div>
+            <div class="btn-group btn-block">
+                <button @onclick="@(() => CalcularTotal())" type="submit" class="btn btn-success"><i class="oi oi-check"></i><text style="color:white"> @textSubmit</text></button>
+                <button @onclick="@Volver" class="btn btn-danger"><i class="oi oi-x"></i><text style="color:white"> Cancelar y volver atrás</text></button>
             </div>
         </div>
     </div>
@@ -153,9 +149,9 @@
     [Parameter] public Venta venta { get; set; } = new Venta();
     [Parameter] public List<Cliente> clientes { get; set; } = new List<Cliente>();
     [Parameter] public List<Articulo> articulos { get; set; } = new List<Articulo>();
-    [Parameter] public EventCallback OnValidSubmit { get; set; }
 
-    [Parameter] public string textSubmit { get; set; } = "Finalizar Venta";
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+    [Parameter] public string textSubmit { get; set; }
 
     public bool ocultaclientes = true;
 

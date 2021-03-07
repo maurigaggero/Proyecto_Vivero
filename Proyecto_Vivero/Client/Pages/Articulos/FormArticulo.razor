@@ -1,14 +1,17 @@
 ﻿@using Proyecto_Vivero.Shared
-@inject NavigationManager NavigationManager
-@inject HttpClient Http
 
 <EditForm Model="@articulo" OnValidSubmit="@OnValidSubmit">
-    <div class="form-field m-2">
+    <div class="form-field mt-2 mb-2">
         <div class="row">
             <div class="col-6">
-                <div class="d-flex justify-content-center m-2">
-                    <img src="@articulo.Url_Imagen" alt="Imagen artículo"
-                         style="border-radius:0.5rem; width:110px; height:105px">
+                <div class="form-group row">
+                    <label class="col-4 col-form-label">Imagen</label>
+                    <div class="col">
+                        <div class="figure-img">
+                            <img src="@articulo.Url_Imagen" alt="No img"
+                                 style="border-radius:0.5rem; width:110px; height:105px">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group row">
@@ -133,24 +136,18 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="d-flex justify-content-center m-2">
-        <div class="btn-group btn-block">
-            <button type="submit" class="btn btn-success">
-                <i class="@ImgBotonSubmit"></i>
-                <text style="color:white">@TextBotonSubmit</text>
-            </button>
-            <button @onclick="@Volver" class="btn btn-secondary"><i class="oi oi-arrow-circle-left"></i><text style="color:white"> Volver atrás</text></button>
-        </div>
+        <button type="submit" class="btn btn-block btn-success">
+            <i class="oi oi-check "></i>
+            <text style="color:white"> @TextBotonSubmit</text>
+        </button>
     </div>
     <DataAnnotationsValidator />
 </EditForm>
 
 @code {
     [Parameter] public Articulo articulo { get; set; } = new Articulo();
-    [Parameter] public string ImgBotonSubmit { get; set; } = "oi oi-check";
-    [Parameter] public string TextBotonSubmit { get; set; } = "Agregar Articulo";
+    [Parameter] public string TextBotonSubmit { get; set; }
     [Parameter] public EventCallback OnValidSubmit { get; set; }
 
     public int porcentaje { get; set; }
@@ -158,10 +155,5 @@
     public void CalcularUnitario()
     {
         articulo.PrecioUnitario = articulo.CalcularUnitario(articulo.PrecioMayorista, porcentaje);
-    }
-
-    void Volver()
-    {
-        NavigationManager.NavigateTo("/lista-articulos");
     }
 }

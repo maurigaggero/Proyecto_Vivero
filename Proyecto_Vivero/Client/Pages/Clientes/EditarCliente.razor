@@ -9,20 +9,28 @@
 
 @using Proyecto_Vivero.Shared
 
-<div class="d-flex justify-content-between m-2">
-    <h2><b>Editar cliente</b></h2>
-    <button @onclick="@(() => BorrarCliente(cliente.Id))" class="btn btn-danger">
-        <i class="oi oi-trash"></i> Eliminar cliente
-    </button>
+<button @onclick="@Volver" class="btn btn-sm btn-secondary">
+    <i class="oi oi-arrow-circle-left"></i> Volver al listado
+</button>
+
+<hr />
+
+<div class="d-flex justify-content-between mb-3">
+    <h3><b>Editar cliente</b></h3>
+    <div>
+        <button @onclick="@(() => BorrarCliente(cliente.Id))" class="btn btn-sm btn-danger">
+            <i class="oi oi-trash"></i> Eliminar cliente
+        </button>
+    </div>
 </div>
 
-<ComponenteFormCliente cliente="cliente" OnValidSubmit="@EditarClient"
-                       oculta="oculta" TextBotonSubmit=" Editar Cliente" />
+<FormCliente cliente="cliente" OnValidSubmit="@EditarClient"
+                       ocultadni="ocultadni" TextBotonSubmit="Guardar cambios" />
 
 @if (cuenta.Count != 0)
 {
     <hr />
-    <div class="card">
+    <div class="card mb-3">
         <div class="card-body">
             <h3 class="m-1">Movimientos</h3>
             <table class="table table-hover m-1">
@@ -65,7 +73,6 @@
             </table>
         </div>
     </div>
-    <hr />
 }
 
 @code {
@@ -73,7 +80,7 @@
     public List<CuentaCorriente> cuenta { get; set; } = new List<CuentaCorriente>();
 
     [Parameter] public int idcliente { get; set; }
-    public bool oculta = true;
+    public bool ocultadni = true;
 
     protected async override Task OnParametersSetAsync()
     {
@@ -123,5 +130,10 @@
                     $"No se pudo editar cliente", "error");
             }
         }
+    }
+
+    void Volver()
+    {
+        NavigationManager.NavigateTo("/lista-articulos");
     }
 }

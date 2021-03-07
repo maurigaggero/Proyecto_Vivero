@@ -1,8 +1,7 @@
 ﻿@using Proyecto_Vivero.Shared
-@inject NavigationManager NavigationManager
 
 <EditForm Model="@cliente" OnValidSubmit="@OnValidSubmit">
-    <div class="form-field m-2">
+    <div class="form-field mt-2 mb-2">
         <div class="form-group row">
             <label class="col-3 col-form-label">Nombre y Apellido</label>
             <div class="col">
@@ -17,7 +16,7 @@
             <label class="col-3 col-form-label">DNI</label>
             <div class="col">
                 <div class="input-group">
-                    <InputText @bind-Value="@cliente.Dni" placeholder="DNI" class="form-control" readonly="@oculta" />
+                    <InputText @bind-Value="@cliente.Dni" placeholder="DNI" class="form-control" readonly="@ocultadni" />
                 </div>
                 <ValidationMessage For="@(() => cliente.Dni)" />
             </div>
@@ -42,7 +41,7 @@
             <label class="col-3 col-form-label">Dirección</label>
             <div class="col">
                 <div class="input-group">
-                    <InputText @bind-Value="@cliente.Dirección" class="form-control" oninput="this.value=this.value.toUpperCase()" placeholder="Dirección"/>
+                    <InputText @bind-Value="@cliente.Dirección" class="form-control" oninput="this.value=this.value.toUpperCase()" placeholder="Dirección" />
                 </div>
                 <ValidationMessage For="@(() => cliente.Dirección)" />
             </div>
@@ -52,34 +51,23 @@
             <label class="col-3 col-form-label">Teléfono</label>
             <div class="col">
                 <div class="input-group">
-                    <InputText @bind-Value="@cliente.Teléfono" class="form-control" oninput="this.value=this.value.toUpperCase()" placeholder="Teléfono"/>
+                    <InputText @bind-Value="@cliente.Teléfono" class="form-control" oninput="this.value=this.value.toUpperCase()" placeholder="Teléfono" />
                 </div>
                 <ValidationMessage For="@(() => cliente.Teléfono)" />
             </div>
         </div>
-    </div>
 
-    <div class="d-flex justify-content-center m-2">
-        <div class="btn-group btn-block">
-            <button type="submit" class="btn btn-success">
-                <i class="@ImgBotonSubmit"></i>
-                <text style="color:white">@TextBotonSubmit</text>
-            </button>
-            <button @onclick="@Volver" class="btn btn-secondary"><i class="oi oi-arrow-circle-left"></i><text style="color:white"> Volver atrás</text></button>
-        </div>
+        <button type="submit" class="btn btn-block btn-success">
+            <i class="oi oi-check "></i>
+            <text style="color:white"> @TextBotonSubmit</text>
+        </button>
     </div>
     <DataAnnotationsValidator />
 </EditForm>
 
 @code {
     [Parameter] public Cliente cliente { get; set; } = new Cliente();
-    [Parameter] public string ImgBotonSubmit { get; set; } = "oi oi-check";
-    [Parameter] public string TextBotonSubmit { get; set; } = "Agregar Cliente";
+    [Parameter] public string TextBotonSubmit { get; set; }
     [Parameter] public EventCallback OnValidSubmit { get; set; }
-    [Parameter] public bool oculta { get; set; } = false;
-
-    void Volver()
-    {
-        NavigationManager.NavigateTo("/lista-clientes");
-    }
+    [Parameter] public bool ocultadni { get; set; } = false;
 }

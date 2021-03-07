@@ -9,10 +9,10 @@
 
 @using Proyecto_Vivero.Shared
 
-<h2><b>Nuevo pago</b></h2>
+<h3><b>Nuevo pago</b></h3>
 
-<ComponenteFormPago textSubmit=" Finalizar Pago" OnValidSubmit="CreaPago" pago="pago"
-                     clientes="clientes"></ComponenteFormPago>
+<FormPago textSubmit=" Finalizar pago" OnValidSubmit="CreaPago" pago="pago"
+                     clientes="clientes"></FormPago>
 
 @code {
     public Pago pago = new Pago();

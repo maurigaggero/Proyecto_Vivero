@@ -1,10 +1,7 @@
 ﻿@using Proyecto_Vivero.Shared
-@inject NavigationManager NavigationManager
-@inject HttpClient Http
-@inject IJSRuntime JS
 
 <EditForm Model="@pedido" OnValidSubmit="OnValidSubmit">
-    <div class="form-field m-2">
+    <div class="form-field mt-2 mb-2">
         <div class="form-group row">
             <label class="col-3 col-form-label">Cliente</label>
             <div class="col">
@@ -29,43 +26,41 @@
 
                 <h5>Ítem #@(i + 1)</h5>
 
-                <div class="card" style="background-color:lightgrey; border-radius:1rem">
-                    <div class="form-group m-2">
-                        <div class="row">
-                            <div class="col-5">
-                                <label>Artículo </label>
-                            </div>
-                            <div class="col">
-                                <label>Cantidad </label>
-                            </div>
-                            <div class="col"></div>
+                <div class="card mb-2" style="background-color:lightgrey; border-radius:0.5rem">
+                    <div class="row ml-1 mt-1">
+                        <div class="col-5">
+                            <label>Artículo </label>
                         </div>
-                        <div class="row">
-                            <div class="col-5">
-                                <InputSelect @bind-Value="detalle.ArticuloId" required class="form-control">
-                                    <option selected value="">Seleccione un artículo</option>
-                                    @foreach (var articulo in articulos)
-                                        {
-                                        <option value="@articulo.Id">@articulo.Nombre | $@articulo.PrecioUnitario | STOCK: @articulo.StockActual</option>
-                                        }
-                                </InputSelect>
-                                <ValidationMessage For="@(() => detalle.ArticuloId)" />
-                            </div>
-                            <div class="col">
-                                <InputNumber @bind-Value="detalle.Cantidad" class="form-control" min="1" />
-                                <ValidationMessage For="@(() => detalle.Cantidad)" />
-                            </div>
-                            <div class="col">
-                                <button type="button" @onclick="@(() => pedido.DetallePedidos.RemoveAt(indice))" class="btn btn-danger btn-sm" style="border-radius:10px">
-                                    <i class="oi oi-trash"></i><text style="color:white"> Quitar ítem @(indice+1)</text>
-                                </button>
-                            </div>
+                        <div class="col">
+                            <label>Cantidad </label>
+                        </div>
+                        <div class="col"></div>
+                    </div>
+                    <div class="row ml-1 mb-1">
+                        <div class="col-5">
+                            <InputSelect @bind-Value="detalle.ArticuloId" required class="form-control">
+                                <option selected value="">Seleccione un artículo</option>
+                                @foreach (var articulo in articulos)
+                                    {
+                                    <option value="@articulo.Id">@articulo.Nombre | $@articulo.PrecioUnitario | STOCK: @articulo.StockActual</option>
+                                    }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => detalle.ArticuloId)" />
+                        </div>
+                        <div class="col">
+                            <InputNumber @bind-Value="detalle.Cantidad" class="form-control" min="1" />
+                            <ValidationMessage For="@(() => detalle.Cantidad)" />
+                        </div>
+                        <div class="col">
+                            <button type="button" @onclick="@(() => pedido.DetallePedidos.RemoveAt(indice))" class="btn btn-danger btn-sm" style="border-radius:10px">
+                                <i class="oi oi-trash"></i><text style="color:white"> Quitar ítem @(indice+1)</text>
+                            </button>
                         </div>
                     </div>
                 </div>
             }
 
-            <div class="form-group m-2">
+            <div class="btn-group">
                 <button type="button" class="btn btn-success"
                         @onclick="@(() => pedido.DetallePedidos.Add(new DetallePedido()))">
                     Agregar ítem
@@ -95,11 +90,8 @@
                 <ValidationMessage For="@(() => pedido.Finalizado)" />
             </div>
 
-            <div class="d-flex justify-content-start">
-                <div class="btn-group btn-block">
-                    <button @onclick="@Volver" class="btn btn-secondary"><i class="oi oi-arrow-circle-left"></i><text style="color:white"> Volver atrás</text></button>
-                    <button type="submit" class="btn btn-success"><i class="oi oi-check"></i><text style="color:white"> @textSubmit</text></button>
-                </div>
+            <div class="btn-group btn-block">
+                <button type="submit" class="btn btn-success"><i class="oi oi-check"></i><text style="color:white"> @textSubmit</text></button>
             </div>
         </div>
     </div>
@@ -112,10 +104,5 @@
     [Parameter] public List<Articulo> articulos { get; set; } = new List<Articulo>();
     [Parameter] public EventCallback OnValidSubmit { get; set; }
 
-    [Parameter] public string textSubmit { get; set; } = "Guardar Pedido";
-
-    void Volver()
-    {
-        NavigationManager.NavigateTo("/lista-pedidos");
-    }
+    [Parameter] public string textSubmit { get; set; }
 }

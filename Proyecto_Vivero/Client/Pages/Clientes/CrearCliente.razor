@@ -9,10 +9,19 @@
 
 @using Proyecto_Vivero.Shared
 
-<h2><b>Nuevo cliente</b></h2>
+<div class="d-flex justify-content-between mb-3">
+    <div>
+        <button @onclick="@Volver" class="btn btn-sm btn-secondary">
+            <i class="oi oi-arrow-circle-left"></i> Volver al listado
+        </button>
+    </div>
+    <div>
+        <h3><b>Nuevo cliente</b></h3>
+    </div>
+</div>
 
-<ComponenteFormCliente cliente="cliente" TextBotonSubmit=" Agregar Cliente"
-                       OnValidSubmit="@CrearClient" />
+<FormCliente cliente="cliente" TextBotonSubmit="Guardar cliente"
+             OnValidSubmit="@CrearClient" />
 
 @code {
     public Cliente cliente = new Cliente();
@@ -31,5 +40,10 @@
             await JS.InvokeVoidAsync("simple", "Error",
                     $"DNI: {cliente.Dni} ya registrado. ", "error");
         }
+    }
+
+    void Volver()
+    {
+        NavigationManager.NavigateTo("/lista-articulos");
     }
 }

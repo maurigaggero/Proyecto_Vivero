@@ -9,9 +9,18 @@
 
 @using Proyecto_Vivero.Shared
 
-<h2><b>Nuevo artículo</b></h2>
+<div class="d-flex justify-content-between mb-3">
+    <div>
+        <button @onclick="@Volver" class="btn btn-sm btn-secondary">
+            <i class="oi oi-arrow-circle-left"></i> Volver al listado
+        </button>
+    </div>
+    <div>
+        <h3><b>Nuevo artículo</b></h3>
+    </div>
+</div>
 
-<ComponenteFormArticulo TextBotonSubmit=" Agregar Articulo" ImgBotonSubmit="oi oi-check" OnValidSubmit="@CrearArtic" articulo="@articulo" />
+<FormArticulo TextBotonSubmit="Guardar artículo" OnValidSubmit="@CrearArtic" articulo="@articulo" />
 
 @code {
     Articulo articulo = new Articulo();
@@ -30,5 +39,10 @@
             await JS.InvokeVoidAsync("simple", "Error",
                     "No se pudo crear artículo", "error");
         }
+    }
+
+    void Volver()
+    {
+        NavigationManager.NavigateTo("/lista-articulos");
     }
 }

@@ -9,15 +9,23 @@
 
 @using Proyecto_Vivero.Shared
 
-<div class="d-flex justify-content-between m-2">
-    <h2><b>Editar articulo</b></h2>
-    <button @onclick="@(() => BorrarArticulo(articulo.Id))" class="btn btn-danger">
-        <i class="oi oi-trash"></i> Eliminar artículo
-    </button>
+<button @onclick="@Volver" class="btn btn-sm btn-secondary">
+    <i class="oi oi-arrow-circle-left"></i> Volver al listado
+</button>
+
+<hr />
+
+<div class="d-flex justify-content-between mb-3">
+    <h3><b>Editar artículo</b></h3>
+    <div>
+        <button @onclick="@(() => BorrarArticulo(articulo.Id))" class="btn btn-sm btn-danger">
+            <i class="oi oi-trash"></i> Eliminar artículo
+        </button>
+    </div>
 </div>
 
-<ComponenteFormArticulo TextBotonSubmit=" Editar articulo" OnValidSubmit="@EditarArtic"
-                        articulo="@articulo" />
+<FormArticulo TextBotonSubmit="Guardar cambios"
+                        OnValidSubmit="@EditarArtic" articulo="@articulo" />
 
 @code {
     Articulo articulo = new Articulo();
@@ -26,6 +34,11 @@
     protected async override Task OnParametersSetAsync()
     {
         articulo = await Http.GetFromJsonAsync<Articulo>($"/api/articulos/{idarticulo}");
+    }
+
+    void Volver()
+    {
+        NavigationManager.NavigateTo("/lista-articulos");
     }
 
     async Task EditarArtic()

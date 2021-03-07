@@ -9,10 +9,10 @@
 
 @using Proyecto_Vivero.Shared
 
-<div class="d-flex justify-content-between m-2">
+<div class="d-flex justify-content-between mb-2">
     <div class="btn-group">
         <button class="btn btn-sm btn-secondary" @onclick="@Volver">
-            Volver atrás
+            <i class="oi oi-arrow-circle-left"></i> Volver atrás
         </button>
         <button class="btn btn-sm btn-primary" onclick="window.print()">
             Imprimir
@@ -20,14 +20,14 @@
     </div>
     <div class="btn-group">
         <button @onclick="@(() => BorrarVenta(venta.Id))" class="btn btn-sm btn-danger">
-            <i class="oi oi-trash"></i>Eliminar venta
+            <i class="oi oi-trash"></i> Eliminar venta
         </button>
     </div>
 </div>
 
 @if (venta != null)
 {
-    <div class="card m-2" style="border-color:grey; border-style:dotted">
+    <div class="card m-1" style="border-color:grey; border-style:dotted">
         <div class="card-body">
             <h4 class="card-title d-flex justify-content-center">
                 <b>FACTURA</b>
