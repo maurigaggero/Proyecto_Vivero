@@ -100,8 +100,8 @@
 
             if (respuesta.IsSuccessStatusCode)
             {
-                await JS.InvokeVoidAsync("simple", "¡Exito!", "Pago eliminado", "success");
                 NavigationManager.NavigateTo("lista-pagos");
+                await JS.InvokeVoidAsync("simple", "¡Exito!", "Pago eliminado", "success");
             }
             else
             {

@@ -38,8 +38,8 @@
 
             if (respuesta.IsSuccessStatusCode)
             {
-                await JS.InvokeVoidAsync("simple", "¡Éxito!", "Artículo editado", "success");
                 NavigationManager.NavigateTo("/lista-articulos");
+                await JS.InvokeVoidAsync("simple", "¡Éxito!", "Artículo editado", "success");
             }
             else
             {
@@ -59,8 +59,8 @@
 
             if (respuesta.IsSuccessStatusCode)
             {
-                await JS.InvokeVoidAsync("simple", "¡Éxito!", "Artículo eliminado", "success");
                 NavigationManager.NavigateTo("/lista-articulos");
+                await JS.InvokeVoidAsync("simple", "¡Éxito!", "Artículo eliminado", "success");
             }
             else
             {

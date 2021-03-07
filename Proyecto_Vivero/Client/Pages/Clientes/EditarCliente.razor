@@ -91,9 +91,9 @@
 
             if (respuesta.IsSuccessStatusCode)
             {
-                await JS.InvokeVoidAsync("simple", "¡Éxito!",
-                    "Cliente eliminado", "success");
                 NavigationManager.NavigateTo("/lista-clientes");
+                await JS.InvokeVoidAsync("simple", "¡Éxito!",
+                "Cliente eliminado", "success");
             }
             else
             {
@@ -113,9 +113,9 @@
 
             if (respuesta.IsSuccessStatusCode)
             {
-                await JS.InvokeVoidAsync("simple", "¡Éxito!",
-                    "Cliente editado", "success");
                 NavigationManager.NavigateTo("/lista-clientes");
+                await JS.InvokeVoidAsync("simple", "¡Éxito!",
+                "Cliente editado", "success");
             }
             else
             {

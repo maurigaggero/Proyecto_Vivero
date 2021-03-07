@@ -35,8 +35,8 @@
 
             if (respuesta.IsSuccessStatusCode)
             {
-                await JS.InvokeVoidAsync("simple", "¡Éxito!", "Pedido finalizado", "success");
                 NavigationManager.NavigateTo("/lista-pedidos");
+                await JS.InvokeVoidAsync("simple", "¡Éxito!", "Pedido finalizado", "success");
             }
             else
             {

@@ -36,8 +36,8 @@
 
             if (respuesta.IsSuccessStatusCode)
             {
-                await JS.InvokeVoidAsync("simple", "¡Éxito!", "Venta finalizada", "success");
                 NavigationManager.NavigateTo("/ver-venta/" + cuerporespuest);
+                await JS.InvokeVoidAsync("simple", "¡Éxito!", "Venta finalizada", "success");
             }
             else
             {

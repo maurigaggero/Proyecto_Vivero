@@ -169,8 +169,8 @@ else
 
             if (respuesta.IsSuccessStatusCode)
             {
-                await JS.InvokeVoidAsync("simple", "¡Exito!", "Pedido eliminado", "success");
                 await CargarPedidos();
+                await JS.InvokeVoidAsync("simple", "¡Exito!", "Pedido eliminado", "success");
             }
             else
             {

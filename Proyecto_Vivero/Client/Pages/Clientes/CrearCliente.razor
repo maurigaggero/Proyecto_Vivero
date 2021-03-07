@@ -23,13 +23,13 @@
 
         if (respuesta.IsSuccessStatusCode)
         {
-            await JS.InvokeVoidAsync("simple", "¡Éxito!", "Cliente creado", "success");
             NavigationManager.NavigateTo("/lista-clientes");
+            await JS.InvokeVoidAsync("simple", "¡Éxito!", "Cliente creado", "success");
         }
         else
         {
             await JS.InvokeVoidAsync("simple", "Error",
-                    $"DNI: {cliente.Dni} ya registrado.", "error");
+                    $"DNI: {cliente.Dni} ya registrado. ", "error");
         }
     }
 }

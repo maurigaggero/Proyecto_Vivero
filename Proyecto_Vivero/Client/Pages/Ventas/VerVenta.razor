@@ -115,8 +115,8 @@
 
             if (respuesta.IsSuccessStatusCode)
             {
-                await JS.InvokeVoidAsync("simple", "¡Exito!", "Venta eliminada", "success");
                 NavigationManager.NavigateTo("lista-ventas");
+                await JS.InvokeVoidAsync("simple", "¡Exito!", "Venta eliminada", "success");
             }
             else
             {

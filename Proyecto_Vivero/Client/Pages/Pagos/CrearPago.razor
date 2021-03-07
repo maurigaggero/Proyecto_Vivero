@@ -34,8 +34,8 @@
 
             if (respuesta.IsSuccessStatusCode)
             {
-                await JS.InvokeVoidAsync("simple", "¡Éxito!", "Pago finalizado", "success");
                 NavigationManager.NavigateTo("/ver-pago/" + cuerporespuest);
+                await JS.InvokeVoidAsync("simple", "¡Éxito!", "Pago finalizado", "success");
             }
             else
             {
