@@ -24,6 +24,8 @@ namespace Proyecto_Vivero.Shared
         public string EmpleadoId { get; set; }
         [ForeignKey("EmpleadoId")]
         public virtual ApplicationUser ApplicationUser { get; set; }
+        [Required]
+        public string Concepto { get; set; }
         [Required, EnumDataType(typeof(FormasPago))]
         public FormasPago FormaPago { get; set; }
         [Required]

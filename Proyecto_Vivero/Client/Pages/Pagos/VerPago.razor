@@ -8,6 +8,7 @@
 @attribute [Authorize]
 
 @using Proyecto_Vivero.Shared
+@using System.Text.Json
 
 <div class="d-flex justify-content-between mb-2">
     <div class="btn-group">
@@ -28,53 +29,54 @@
 @if (pago != null)
 {
     <div class="card m-1" style="margin:25px; background-color:#f4f4f4; border-style:dotted">
-        <div class="card-body">
+        <div class="card-body" style="te">
             <h4 class="card-title d-flex justify-content-center">
                 <b>RECIBO DE PAGO</b>
             </h4>
 
             <div class="d-flex justify-content-between">
                 <b>VIVERO BRITH</b>
-                <text><b>N° COMPROBANTE:</b> @pago.Id</text>
+                <small><b>N° Comprobante:</b> @pago.Id</small>
             </div>
 
             <div class="d-flex justify-content-between">
-                <text>Tienda de vivero y jardineria</text>
-                <text><b>FECHA:</b> @pago.Fecha</text>
+                <small>Tienda de vivero y jardineria</small>
+                <small><b>Fecha:</b> @pago.Fecha</small>
             </div>
             <div class="d-flex justify-content-between">
-                <text>H. Irigoyen esq. Córdoba, Río Segundo</text>
-                <text><b>EMPLEADO:</b> @pago.ApplicationUser.NombreyApellido</text>
+                <small>H. Irigoyen esq. Córdoba, Río Segundo</small>
+                <small><b>F.de Pago :</b> @pago.FormaPago</small>
             </div>
 
             <div class="d-flex justify-content-between">
-                <text>3572550166</text>
+                <small>3572550166</small>
+                <small><b>Empleado:</b> @pago.ApplicationUser.NombreyApellido</small>
             </div>
 
             <hr />
             <div class="text-left">
-                <text><b>CLIENTE:</b> @pago.Cliente.NombreyApellido</text> <br />
-                <text><b>DIRECCIÓN:</b> @pago.Cliente.Dirección</text> <br />
-                <text><b>TELÉFONO:</b> @pago.Cliente.Teléfono</text>
+                <small><b>Cliente:</b> @pago.Cliente.NombreyApellido</small> <br />
+                <small><b>Dirección:</b> @pago.Cliente.Dirección</small> <br />
+                <small><b>Teléfono:</b> @pago.Cliente.Teléfono</small>
             </div>
             <hr />
 
             <table class="table table-sm">
                 <thead>
                     <tr>
-                        <th style="text-align:justify">CONCEPTO</th>
+                        <th style="text-align:justify"><small>Concepto</small></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td style="text-align:justify">Pago cuenta corriente N° @pago.Cliente.Dni</td>
+                        <td style="text-align:justify"><small>@pago.Concepto</small></td>
                     </tr>
                 </tbody>
             </table>
 
             <p class="card-text text-right" style="margin:1.5rem">
-                <h5><b>IMPORTE</b></h5>
-                <h4><b>$@pago.Importe</b></h4>
+                <h6><b>IMPORTE</b></h6>
+                <h5><b>$@pago.Importe</b></h5>
             </p>
         </div>
     </div>
@@ -87,7 +89,18 @@
 
     protected override async Task OnInitializedAsync()
     {
-        pago = await Http.GetFromJsonAsync<Pago>($"api/pagos/{idpago}");
+        var httpResponse = await Http.GetAsync($"api/pagos/{idpago}");
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            var responseString = await httpResponse.Content.ReadAsStringAsync();
+            pago = JsonSerializer.Deserialize<Pago>(responseString,
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("simple", "Error", "Pago no encontrado.", "error");
+            NavigationManager.NavigateTo("lista-pagos");
+        }
     }
 
     async Task BorrarPago(int idpago)

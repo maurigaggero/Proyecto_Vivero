@@ -45,23 +45,16 @@ namespace Proyecto_Vivero.Shared
         public int ArticuloId { get; set; }
         [ForeignKey("ArticuloId")]
         public Articulo Articulo { get; set; }
+        public decimal Precio { get; set; }
         [Required]
         public int Cantidad { get; set; }
         [Required]
         public int Descuento { get; set; }
-        public decimal SubTotal { get; set; }
+        public decimal SubTotal => ((Precio * Cantidad) + (Precio * Cantidad) * (- Descuento) / 100);
         [Required]
         public int VentaId { get; set; }
         [ForeignKey("VentaId")]
         public Venta Venta { get; set; }
-        #endregion
-
-        #region MÉTODOS
-        public decimal CalcularSubTotal(int cantidad, decimal precio, decimal descuento)
-        {
-            decimal subtotal = ((precio * cantidad) + (precio * cantidad) * - descuento / 100);
-            return subtotal;
-        }
         #endregion
     }
 }

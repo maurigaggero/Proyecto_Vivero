@@ -38,10 +38,10 @@ namespace Proyecto_Vivero.Shared
         [Range(1, 99999999, ErrorMessage = "Valor inválido")]
         public int Cantidad { get; set; }
         [Required]
-        public decimal Precio_Mayorista { get; set; }
+        public decimal PrecioMayorista { get; set; }
         [Required]
-        public decimal Precio_Unitario { get; set; }
-        public decimal SubTotal { get; set; }
+        public decimal PrecioUnitario { get; set; }
+        public decimal SubTotal => PrecioMayorista * Cantidad;
         [Required]
         public int CompraId { get; set; }
         [ForeignKey("CompraId")]
@@ -49,16 +49,9 @@ namespace Proyecto_Vivero.Shared
         #endregion
 
         #region MÉTODOS
-        public decimal CalcularSubTotal(int cantidad, decimal precio)
+        public void CalcularUnitario(int porcentaje)
         {
-            decimal subtotal = (precio * cantidad);
-            return subtotal;
-        }
-
-        public decimal CalcularUnitario(decimal mayorista, int porcentaje)
-        {
-            decimal unitario = ((mayorista) + (porcentaje * mayorista) / 100);
-            return unitario;
+            PrecioUnitario = ((PrecioMayorista) + (porcentaje * PrecioMayorista) / 100);
         }
         #endregion
     }

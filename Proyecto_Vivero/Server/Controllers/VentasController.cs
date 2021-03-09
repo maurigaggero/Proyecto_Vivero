@@ -147,8 +147,8 @@ namespace Proyecto_Vivero.Server.Controllers
             CuentaCorriente cuenta = new CuentaCorriente()
             {
                 Fecha = venta.Fecha,
-                VentaId = venta.Id,
                 ClienteId = Convert.ToInt32(venta.ClienteId),
+                ComprobanteId = venta.Id,
                 Concepto = CuentaCorriente.Conceptos.Debe,
                 Importe = venta.Total,
                 Saldo_Parcial = venta.Cliente.Saldo
@@ -165,7 +165,15 @@ namespace Proyecto_Vivero.Server.Controllers
             await c.Put(cliente);
 
             CuentasCorrientesController cc = new CuentasCorrientesController(context);
-            await cc.Delete("venta", venta.Id);
+            CuentaCorriente cuenta = new CuentaCorriente()
+            {
+                Fecha = DateTime.Now,
+                ClienteId = Convert.ToInt32(venta.ClienteId),
+                Concepto = CuentaCorriente.Conceptos.Reajuste,
+                Importe = -venta.Total,
+                Saldo_Parcial = venta.Cliente.Saldo
+            };
+            await cc.Post(cuenta);
         }
 
         private async Task DecrementaStock(Venta venta)

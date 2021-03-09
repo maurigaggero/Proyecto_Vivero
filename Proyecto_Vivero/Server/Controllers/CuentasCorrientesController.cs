@@ -68,43 +68,6 @@ namespace Proyecto_Vivero.Server.Controllers
             return Ok();
         }
 
-
-        // PUT: api/cuentascorrientes
-        [HttpPut]
-        public async Task<ActionResult> Put(CuentaCorriente cuenta)
-        {
-            context.Entry(cuenta).State = EntityState.Modified;
-            await context.SaveChangesAsync();
-            return Ok();
-        }
-
-        // DELETE: api/cuentascorrientes/5  
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<CuentaCorriente>> Delete(string borrar, int id)
-        {
-            CuentaCorriente cuenta = new CuentaCorriente();
-
-            if (borrar == "pago")
-            {
-                cuenta = await context.CuentasCorrientes.FirstAsync(x => x.PagoId == id);
-
-            }
-            if (borrar == "venta")
-            {
-                cuenta = await context.CuentasCorrientes.FirstAsync(x => x.VentaId == id);
-            }
-
-            if (cuenta == null)
-            {
-                return NotFound();
-            }
-
-            context.CuentasCorrientes.Remove(cuenta);
-            await context.SaveChangesAsync();
-
-            return cuenta;
-        }
-
         private bool Exists(int id)
         {
             return context.CuentasCorrientes.Any(e => e.Id == id);

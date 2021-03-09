@@ -8,6 +8,7 @@
 @attribute [Authorize]
 
 @using Proyecto_Vivero.Shared
+@using System.Text.Json
 
 <div class="d-flex justify-content-between mb-2">
     <div class="btn-group">
@@ -35,30 +36,30 @@
 
             <div class="d-flex justify-content-between">
                 <b>VIVERO BRITH</b>
-                <text><b>N° COMPROBANTE:</b> @venta.Id</text>
+                <small><b>N° Comprobante:</b> @venta.Id</small>
             </div>
 
             <div class="d-flex justify-content-between">
-                <text>Tienda de vivero y jardineria</text>
-                <text><b>FECHA:</b> @venta.Fecha</text>
+                <small>Tienda de vivero y jardineria</small>
+                <small><b>Fecha:</b> @venta.Fecha</small>
             </div>
             <div class="d-flex justify-content-between">
-                <text>H. Irigoyen esq. Córdoba, Río Segundo</text>
-                <text><b>FORMA DE PAGO:</b> @venta.FormaPago</text>
+                <small>H. Irigoyen esq. Córdoba, Río Segundo</small>
+                <small><b>F.de Pago:</b> @venta.FormaPago</small>
             </div>
 
             <div class="d-flex justify-content-between">
-                <text>3572550166</text>
-                <text><b>EMPLEADO:</b> @venta.ApplicationUser.NombreyApellido</text>
+                <small>3572550166</small>
+                <small><b>Empleado:</b> @venta.ApplicationUser.NombreyApellido</small>
             </div>
 
             @if (venta.ClienteId != null)
             {
                 <hr />
                 <div class="text-left">
-                    <text><b>CLIENTE:</b> @venta.Cliente.NombreyApellido</text> <br />
-                    <text><b>DIRECCIÓN:</b> @venta.Cliente.Dirección</text> <br />
-                    <text><b>TELÉFONO:</b> @venta.Cliente.Teléfono</text>
+                    <small><b>Cliente:</b> @venta.Cliente.NombreyApellido</small> <br />
+                    <small><b>Dirección:</b> @venta.Cliente.Dirección</small> <br />
+                    <small><b>Teléfono:</b> @venta.Cliente.Teléfono</small>
                 </div>
             }
             <hr />
@@ -66,30 +67,30 @@
             <table class="table table-sm">
                 <thead>
                     <tr>
-                        <th>DESCRIPCIÓN</th>
-                        <th>PRECIO X UN.</th>
-                        <th>CANTIDAD</th>
-                        <th>DESCUENTO</th>
-                        <th>SUBTOTAL</th>
+                        <th><small>Descripción</small></th>
+                        <th><small>Precio x un.</small></th>
+                        <th><small>Cantidad</small></th>
+                        <th><small>Descuento</small></th>
+                        <th><small>Subtotal</small></th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in venta.DetalleVentas)
                     {
                         <tr>
-                            <td>@item.Articulo.Nombre</td>
-                            <td>@item.Articulo.PrecioUnitario</td>
-                            <td>@item.Cantidad</td>
-                            <td>@item.Descuento%</td>
-                            <td>@item.SubTotal</td>
+                            <td><small>@item.Articulo.Nombre</small></td>
+                            <td><small>@item.Precio</small></td>
+                            <td><small>@item.Cantidad</small></td>
+                            <td><small>@item.Descuento%</small></td>
+                            <td><small>@item.SubTotal</small></td>
                         </tr>
                     }
                 </tbody>
             </table>
 
             <p class="card-text text-right m-4">
-                <h5><b>TOTAL</b></h5>
-                <h4><b>$@venta.Total</b></h4>
+                <h6><b>TOTAL</b></h6>
+                <h5><b>$@venta.Total</b></h5>
             </p>
         </div>
     </div>
@@ -102,7 +103,18 @@
 
     protected override async Task OnInitializedAsync()
     {
-        venta = await Http.GetFromJsonAsync<Venta>($"api/ventas/{idventa}");
+        var httpResponse = await Http.GetAsync($"api/ventas/{idventa}");
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            var responseString = await httpResponse.Content.ReadAsStringAsync();
+            venta = JsonSerializer.Deserialize<Venta>(responseString,
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("simple", "Error", "Venta no encontrada.", "error");
+            NavigationManager.NavigateTo("lista-ventas");
+        }
     }
 
     async Task BorrarVenta(int idventa)

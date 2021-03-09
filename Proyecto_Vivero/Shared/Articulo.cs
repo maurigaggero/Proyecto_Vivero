@@ -49,10 +49,9 @@ namespace Proyecto_Vivero.Shared
         #endregion
 
         #region MÉTODOS
-        public decimal CalcularUnitario(decimal mayorista, int porcentaje)
+        public void CalcularUnitario(int porcentaje)
         {
-            decimal unitario = ((mayorista) + (porcentaje * mayorista) / 100);
-            return unitario;
+            PrecioUnitario = ((PrecioMayorista) + (porcentaje * PrecioMayorista) / 100);
         }
         #endregion
     }

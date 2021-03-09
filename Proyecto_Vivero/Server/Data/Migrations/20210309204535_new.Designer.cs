@@ -10,7 +10,7 @@ using Proyecto_Vivero.Server.Data;
 namespace Proyecto_Vivero.Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210306180719_new")]
+    [Migration("20210309204535_new")]
     partial class @new
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -18,7 +18,7 @@ namespace Proyecto_Vivero.Server.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.3")
+                .HasAnnotation("ProductVersion", "5.0.4")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("IdentityServer4.EntityFramework.Entities.DeviceFlowCodes", b =>
@@ -442,6 +442,9 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                     b.Property<int>("ClienteId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ComprobanteId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Concepto")
                         .HasColumnType("int");
 
@@ -451,22 +454,12 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                     b.Property<decimal>("Importe")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("PagoId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("Saldo_Parcial")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("VentaId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ClienteId");
-
-                    b.HasIndex("PagoId");
-
-                    b.HasIndex("VentaId");
 
                     b.ToTable("CuentasCorrientes");
                 });
@@ -487,13 +480,10 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                     b.Property<int>("CompraId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Precio_Mayorista")
+                    b.Property<decimal>("PrecioMayorista")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("Precio_Unitario")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("SubTotal")
+                    b.Property<decimal>("PrecioUnitario")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
@@ -546,7 +536,7 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                     b.Property<int>("Descuento")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("SubTotal")
+                    b.Property<decimal>("Precio")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("VentaId")
@@ -570,6 +560,10 @@ namespace Proyecto_Vivero.Server.Data.Migrations
 
                     b.Property<int>("ClienteId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Concepto")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmpleadoId")
                         .HasColumnType("nvarchar(450)");
@@ -717,19 +711,7 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Proyecto_Vivero.Shared.Pago", "Pago")
-                        .WithMany()
-                        .HasForeignKey("PagoId");
-
-                    b.HasOne("Proyecto_Vivero.Shared.Venta", "Venta")
-                        .WithMany()
-                        .HasForeignKey("VentaId");
-
                     b.Navigation("Cliente");
-
-                    b.Navigation("Pago");
-
-                    b.Navigation("Venta");
                 });
 
             modelBuilder.Entity("Proyecto_Vivero.Shared.DetalleCompra", b =>

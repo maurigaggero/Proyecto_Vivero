@@ -84,7 +84,7 @@
                             <InputNumber @bind-Value="@porcentaje" class="form-control" />
                             <div class="input-group-append">
                                 <span class="input-group-text">%</span>
-                                <button @onclick="@CalcularUnitario" class="btn btn-secondary" type="button">
+                                <button @onclick="@(() => articulo.CalcularUnitario(porcentaje))" class="btn btn-secondary" type="button">
                                     <text>Calcular</text>
                                 </button>
                             </div>
@@ -151,9 +151,4 @@
     [Parameter] public EventCallback OnValidSubmit { get; set; }
 
     public int porcentaje { get; set; }
-
-    public void CalcularUnitario()
-    {
-        articulo.PrecioUnitario = articulo.CalcularUnitario(articulo.PrecioMayorista, porcentaje);
-    }
 }

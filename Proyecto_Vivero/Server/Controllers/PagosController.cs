@@ -137,8 +137,8 @@ namespace Proyecto_Vivero.Server.Controllers
             CuentaCorriente cuenta = new CuentaCorriente()
             {
                 Fecha = pago.Fecha,
-                PagoId = pago.Id,
                 ClienteId = Convert.ToInt32(pago.ClienteId),
+                ComprobanteId = pago.Id,
                 Concepto = CuentaCorriente.Conceptos.Haber,
                 Importe = -pago.Importe,
                 Saldo_Parcial = pago.Cliente.Saldo
@@ -154,8 +154,16 @@ namespace Proyecto_Vivero.Server.Controllers
             ClientesController c = new ClientesController(context);
             await c.Put(cliente);
 
-            CuentasCorrientesController controller = new CuentasCorrientesController(context);
-            await controller.Delete("pago", pago.Id);
+            CuentasCorrientesController cc = new CuentasCorrientesController(context);
+            CuentaCorriente cuenta = new CuentaCorriente()
+            {
+                Fecha = DateTime.Now,
+                ClienteId = Convert.ToInt32(pago.ClienteId),
+                Concepto = CuentaCorriente.Conceptos.Reajuste,
+                Importe = +pago.Importe,
+                Saldo_Parcial = pago.Cliente.Saldo
+            };
+            await cc.Post(cuenta);
         }
     }
 }

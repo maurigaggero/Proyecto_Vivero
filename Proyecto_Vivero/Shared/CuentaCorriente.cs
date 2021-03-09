@@ -17,12 +17,7 @@ namespace Proyecto_Vivero.Shared
         public int ClienteId { get; set; }
         [ForeignKey("ClienteId")]
         public Cliente Cliente { get; set; }
-        public int? VentaId { get; set; }
-        [ForeignKey("VentaId")]
-        public Venta Venta { get; set; }
-        public int? PagoId { get; set; }
-        [ForeignKey("PagoId")]
-        public Pago Pago { get; set; }
+        public int? ComprobanteId { get; set; }
         public Conceptos Concepto { get; set; }
         public decimal Importe { get; set; }
         public decimal Saldo_Parcial { get; set; }
@@ -32,6 +27,7 @@ namespace Proyecto_Vivero.Shared
         {
             Debe = 1,
             Haber = 2,
+            Reajuste = 3
         }
     }
 }

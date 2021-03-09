@@ -25,7 +25,7 @@
 </div>
 
 <FormCliente cliente="cliente" OnValidSubmit="@EditarClient"
-                       ocultadni="ocultadni" TextBotonSubmit="Guardar cambios" />
+             ocultadni="ocultadni" TextBotonSubmit="Guardar cambios" />
 
 @if (cuenta.Count != 0)
 {
@@ -47,25 +47,18 @@
                     <Virtualize Items="@cuenta" Context="cuenta">
                         <tr @key="cuenta.Id">
                             <td>
-                                @if (cuenta.PagoId == null)
+                                @if (cuenta.Concepto == CuentaCorriente.Conceptos.Debe)
                                 {
-                                    <a href="ver-venta/@cuenta.VentaId" class="btn btn-sm btn-primary">Ver</a>
+                                    <a href="ver-venta/@cuenta.ComprobanteId" class="btn btn-sm btn-primary">Ver</a>
                                 }
-                                @if (cuenta.VentaId == null)
+                                @if (cuenta.Concepto == CuentaCorriente.Conceptos.Haber)
                                 {
-                                    <a href="ver-pago/@cuenta.PagoId" class="btn btn-sm btn-primary">Ver</a>
+                                    <a href="ver-pago/@cuenta.ComprobanteId" class="btn btn-sm btn-primary">Ver</a>
                                 }
                             </td>
                             <td>@cuenta.Fecha</td>
                             <td>@cuenta.Concepto</td>
-                            @if (cuenta.Concepto == CuentaCorriente.Conceptos.Debe)
-                            {
-                                <td><b>+@cuenta.Importe</b></td>
-                            }
-                            else
-                            {
-                                <td><b>@cuenta.Importe</b></td>
-                            }
+                            <td><b>@cuenta.Importe</b></td>
                             <td>@cuenta.Saldo_Parcial</td>
                         </tr>
                     </Virtualize>
@@ -134,6 +127,6 @@
 
     void Volver()
     {
-        NavigationManager.NavigateTo("/lista-articulos");
+        NavigationManager.NavigateTo("/lista-clientes");
     }
 }

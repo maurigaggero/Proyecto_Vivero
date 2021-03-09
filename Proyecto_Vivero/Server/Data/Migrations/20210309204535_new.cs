@@ -76,6 +76,30 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CuentasCorrientes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ClienteId = table.Column<int>(type: "int", nullable: false),
+                    ComprobanteId = table.Column<int>(type: "int", nullable: true),
+                    Concepto = table.Column<int>(type: "int", nullable: false),
+                    Importe = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Saldo_Parcial = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CuentasCorrientes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CuentasCorrientes_Clientes_ClienteId",
+                        column: x => x.ClienteId,
+                        principalTable: "Clientes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Pagos",
                 columns: table => new
                 {
@@ -84,6 +108,7 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                     Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ClienteId = table.Column<int>(type: "int", nullable: false),
                     EmpleadoId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Concepto = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FormaPago = table.Column<int>(type: "int", nullable: false),
                     Importe = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
@@ -163,9 +188,8 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ArticuloId = table.Column<int>(type: "int", nullable: false),
                     Cantidad = table.Column<int>(type: "int", nullable: false),
-                    Precio_Mayorista = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Precio_Unitario = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    SubTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PrecioMayorista = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PrecioUnitario = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     CompraId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -213,52 +237,15 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CuentasCorrientes",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ClienteId = table.Column<int>(type: "int", nullable: false),
-                    VentaId = table.Column<int>(type: "int", nullable: true),
-                    PagoId = table.Column<int>(type: "int", nullable: true),
-                    Concepto = table.Column<int>(type: "int", nullable: false),
-                    Importe = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Saldo_Parcial = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CuentasCorrientes", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CuentasCorrientes_Clientes_ClienteId",
-                        column: x => x.ClienteId,
-                        principalTable: "Clientes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CuentasCorrientes_Pagos_PagoId",
-                        column: x => x.PagoId,
-                        principalTable: "Pagos",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_CuentasCorrientes_Ventas_VentaId",
-                        column: x => x.VentaId,
-                        principalTable: "Ventas",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "DetalleVentas",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ArticuloId = table.Column<int>(type: "int", nullable: false),
+                    Precio = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Cantidad = table.Column<int>(type: "int", nullable: false),
                     Descuento = table.Column<int>(type: "int", nullable: false),
-                    SubTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     VentaId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -287,16 +274,6 @@ namespace Proyecto_Vivero.Server.Data.Migrations
                 name: "IX_CuentasCorrientes_ClienteId",
                 table: "CuentasCorrientes",
                 column: "ClienteId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CuentasCorrientes_PagoId",
-                table: "CuentasCorrientes",
-                column: "PagoId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CuentasCorrientes_VentaId",
-                table: "CuentasCorrientes",
-                column: "VentaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DetalleCompras_ArticuloId",
