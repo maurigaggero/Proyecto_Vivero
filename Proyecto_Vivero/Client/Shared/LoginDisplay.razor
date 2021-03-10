@@ -6,8 +6,8 @@
 
 <AuthorizeView>
     <Authorized>
-        <a class="mr-1" href="authentication/profile">Hola, @context.User.Identity.Name!</a>
-        <button class="btn btn-sm btn-outline-primary" @onclick="BeginSignOut">Cerrar sesión</button>
+        <a class="btn btn-sm btn-outline-primary mr-2" href="authentication/profile">@context.User.Identity.Name</a>
+        <button class="btn btn-sm btn-outline-danger" @onclick="BeginSignOut"><i class="oi oi-account-logout"></i>Salir</button>
     </Authorized>
     <NotAuthorized>
         <a class="btn btn-sm btn-outline-primary" href="authentication/register">Registrarse</a>

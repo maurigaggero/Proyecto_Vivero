@@ -10,13 +10,15 @@
 @using Proyecto_Vivero.Shared
 
 <div class="d-flex justify-content-between mb-3">
-    <div class="btn-group">
-        <button @onclick="@Volver" class="btn btn-sm btn-secondary">
-            <i class="oi oi-arrow-circle-left"></i> Volver al listado
-        </button>
-        <button @onclick="@(() => BorrarCompra(idcompra))" class="btn btn-sm btn-danger">
-            <i class="oi oi-trash"></i> Eliminar compra
-        </button>
+    <div>
+        <div class="btn-group">
+            <button @onclick="@Volver" class="btn btn-sm btn-secondary">
+                <i class="oi oi-arrow-circle-left"></i> Volver al listado
+            </button>
+            <button @onclick="@(() => BorrarCompra(idcompra))" class="btn btn-sm btn-danger">
+                <i class="oi oi-trash"></i> Eliminar compra
+            </button>
+        </div>
     </div>
     <div>
         <h3><b>Ver compra</b></h3>

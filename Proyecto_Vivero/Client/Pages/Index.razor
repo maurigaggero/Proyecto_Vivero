@@ -1,52 +1,15 @@
 ﻿@page "/"
-@using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<div class="alert-light" style="margin:12rem; color:black">
-    <div>
-        <h1><b>Bienvenido/a!</b></h1>
-    </div>
-    <AuthorizeView>
-        <Authorized>
-            <h5>@_authMessage</h5>
-        </Authorized>
-    </AuthorizeView>
+<div id="index">
+    <h2><b>Bienvenido/a!</b></h2>
     <AuthorizeView>
         <NotAuthorized>
-            <div>
-                <h2>Inicie sesión con sus credenciales</h2>
-            </div>
-            <div class="btn-group btn-block">
-                <a href="/authentication/login" class="btn btn-primary">Iniciar sesión</a>
-                <a href="/authentication/register" class="btn btn-outline-primary">Registrarse</a>
-            </div>
+            <h3>Inicie sesión con sus credenciales</h3>
         </NotAuthorized>
     </AuthorizeView>
 </div>
 
 @code{
-    private string _authMessage;
-    private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
-
-    protected override async Task OnInitializedAsync()
-    {
-        await GetUserLogin();
-    }
-
-    private async Task GetUserLogin()
-    {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        if (user.Identity.IsAuthenticated)
-        {
-            _authMessage = $"Autenticado correctamente como {user.Identity.Name} ";
-            _claims = user.Claims;
-        }
-        else
-        {
-            _authMessage = "Usuario no autenticado.";
-        }
-    }
 }
