@@ -50,13 +50,14 @@ else
 </div>
 
 <div class="card mb-2">
-    <div id="ejercicio"></div>
+    <div id="ej_chart"></div>
 </div>
 
 @code {
     public int pedidospendientes { get; set; }
     decimal[] ejercicio { get; set; }
     decimal[] ventasAño { get; set; }
+    decimal[] compras { get; set; }
 
     public List<Venta> ventas { get; set; }
 
@@ -65,6 +66,7 @@ else
         ventas = await Http.GetFromJsonAsync<List<Venta>>($"api/ventas");
 
         ejercicio = await Http.GetFromJsonAsync<decimal[]>($"api/estadisticas/ejercicio");
+        compras = await Http.GetFromJsonAsync<decimal[]>($"api/estadisticas/compras");
         ventasAño = await Http.GetFromJsonAsync<decimal[]>($"api/estadisticas/ventas");
         pedidospendientes = await Http.GetFromJsonAsync<int>("api/estadisticas/pendientes");
 
@@ -73,7 +75,7 @@ else
 
     void MostrarEstadisticas()
     {
-        JS.InvokeVoidAsync("chart_line", ejercicio);
+        JS.InvokeVoidAsync("chart_line", ejercicio, compras);
         JS.InvokeVoidAsync("chart_column", ventasAño);
     }
 }

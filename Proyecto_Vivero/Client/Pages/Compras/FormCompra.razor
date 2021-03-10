@@ -1,0 +1,147 @@
+﻿@using Proyecto_Vivero.Shared
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+
+<EditForm Model="@compra" OnValidSubmit="OnValidSubmit">
+    <div class="form-field mt-2 mb-2">
+        <div class="form-group row">
+            <label class="col-3 col-form-label">Proveedor</label>
+            <div class="col">
+                <div class="input-group">
+                    <InputText @bind-Value="compra.Proveedor" class="form-control" oninput="this.value=this.value.toUpperCase()" />
+                </div>
+                <ValidationMessage For="@(() => compra.Proveedor)" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            @for (int i = 0; i < compra.DetalleCompras.Count; i++)
+            {
+                var indice = i;
+                var detalle = compra.DetalleCompras[i];
+                listadetalle = compra.DetalleCompras;
+
+                <div class="d-flex justify-content-between m-1">
+                    <h5>Ítem #@(i + 1)</h5>
+                    <div>
+                        <button type="button" @onclick="@(() => compra.DetalleCompras.RemoveAt(indice))" class="btn btn-danger btn-sm" style="border-radius:10px">
+                            <i class="oi oi-trash"></i><text style="color:white">Quitar ítem @(indice+1)</text>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card mb-2" style="background-color:lightgrey;border-radius:0.5rem">
+                    <div class="row">
+                        <div class="col-8 form-group">
+                            <label><small>Artículo</small></label>
+                            <InputSelect @bind-Value="detalle.ArticuloId" required class="form-control form-control-sm">
+                                <option selected value="">Seleccione un artículo</option>
+                                @foreach (var articulo in articulos)
+                                    {
+                                        if (articulo.StockActual > 0)
+                                        {
+                                        <option value="@articulo.Id">@articulo.Nombre | $@articulo.PrecioUnitario | STOCK: @articulo.StockActual</option>
+                                        }
+                                    }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => detalle.ArticuloId)" />
+                        </div>
+                        <div class="col-4 form-group">
+                            <label><small>Cantidad</small></label>
+                            <InputNumber @bind-Value="detalle.Cantidad" class="form-control form-control-sm" min="1" />
+                            <ValidationMessage For="@(() => detalle.Cantidad)" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-3 form-group">
+                            <label><small>Precio compra</small></label>
+                            <InputNumber @bind-Value="detalle.PrecioMayorista" class="form-control form-control-sm" step="0.01" />
+                            <ValidationMessage For="@(() => detalle.PrecioMayorista)" />
+                        </div>
+
+                        <div class="col-3 form-group">
+                            <label><small>Porcentaje</small></label>
+                            <div class="input-group">
+                                <InputNumber @bind-Value="@porcentaje" class="form-control form-control-sm" />
+                                <div class="input-group-append">
+                                    <button @onclick="@(() => detalle.CalcularUnitario(porcentaje))" class="btn btn-sm btn-secondary" type="button">
+                                        <i class="oi oi-calculator"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-3 form-group">
+                            <label><small>Precio venta</small></label>
+                            <InputNumber @bind-Value="detalle.PrecioUnitario" class="form-control form-control-sm" step="0.01" />
+                            <ValidationMessage For="@(() => detalle.PrecioUnitario)" />
+                        </div>
+
+                        <div class="col-3">
+                            <div class="d-flex justify-content-end mb-1 ml-2 mr-2">
+                                <label><small>Subtotal</small></label>
+                            </div>
+                            <div class="d-flex justify-content-end mt-2 ml-2 mr-2">
+                                <h5><b>@detalle.SubTotal</b></h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="btn-group">
+                <button type="button" class="btn btn-success"
+                        @onclick="@(() => compra.DetalleCompras.Add(new DetalleCompra()))">
+                    Agregar ítem
+                </button>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button @onclick="@(() => CalcularTotal())" type="button" class="btn btn-light">
+                    <h4><b>TOTAL</b></h4>
+                    @if (compra.Total != 0)
+                    {
+                        <h3><b>$@compra.Total</b></h3>
+                    }
+                </button>
+            </div>
+
+            <div class="btn-group btn-block" hidden="@ocultasubmit">
+                <button @onclick="@(() => CalcularTotal())" type="submit" class="btn btn-success"><i class="oi oi-check"></i><text style="color:white"> @textSubmit</text></button>
+                <button @onclick="@Volver" class="btn btn-danger"><i class="oi oi-x"></i><text style="color:white"> Cancelar y volver atrás</text></button>
+            </div>
+        </div>
+    </div>
+    <DataAnnotationsValidator />
+</EditForm>
+
+@code {
+    [Parameter] public Compra compra { get; set; } = new Compra();
+    [Parameter] public List<Articulo> articulos { get; set; } = new List<Articulo>();
+
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+    [Parameter] public string textSubmit { get; set; }
+    [Parameter] public bool ocultasubmit { get; set; }
+
+    public int porcentaje { get; set; }
+    public List<DetalleCompra> listadetalle { get; set; } = new List<DetalleCompra>();
+
+    decimal CalcularTotal()
+    {
+        compra.Total = 0;
+        if (listadetalle.Count > 0)
+        {
+            @for (int i = 0; i < listadetalle.Count; i++)
+            {
+                compra.Total += listadetalle[i].SubTotal;
+            }
+        }
+        return compra.Total;
+    }
+
+    void Volver()
+    {
+        NavigationManager.NavigateTo("/lista-compras");
+    }
+}

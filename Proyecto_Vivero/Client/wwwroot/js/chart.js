@@ -1,24 +1,25 @@
 ﻿google.charts.load('current', { packages: ['corechart', 'line'] });
-google.charts.setOnLoadCallback(drawLineColors);
+google.charts.setOnLoadCallback(chart_line);
 
-function chart_line(ejercicio) {
+function chart_line(ejercicio, compras) {
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Mes');
     data.addColumn('number', 'Ingresos');
+    data.addColumn('number', 'Gastos');
 
     data.addRows([
-        ['Enero', ejercicio[0]],
-        ['Febrero', ejercicio[1]],
-        ['Marzo', ejercicio[2]],
-        ['Abril', ejercicio[3]],
-        ['Mayo', ejercicio[4]],
-        ['Junio', ejercicio[5]],
-        ['Julio', ejercicio[6]],
-        ['Agosto', ejercicio[7]],
-        ['Septiembre', ejercicio[8]],
-        ['Octubre', ejercicio[9]],
-        ['Noviembre', ejercicio[10]],
-        ['Diciembre', ejercicio[11]],
+        ['Enero', ejercicio[0], compras[0]],
+        ['Febrero', ejercicio[1], compras[1]],
+        ['Marzo', ejercicio[2], compras[2]],
+        ['Abril', ejercicio[3], compras[3]],
+        ['Mayo', ejercicio[4], compras[4]],
+        ['Junio', ejercicio[5], compras[5]],
+        ['Julio', ejercicio[6], compras[6]],
+        ['Agosto', ejercicio[7], compras[7]],
+        ['Septiembre', ejercicio[8], compras[8]],
+        ['Octubre', ejercicio[9], compras[9]],
+        ['Noviembre', ejercicio[10], compras[10]],
+        ['Diciembre', ejercicio[11], compras[11]],
     ]);
 
     var options = {
@@ -27,14 +28,17 @@ function chart_line(ejercicio) {
             title: 'Mes',
         },
         vAxis: {
-            title: '$ (pesos)'
+            title: '$ (pesos)',
         },
         colors: ['#097138', '#a52714']
     };
 
-    var chart = new google.visualization.LineChart(document.getElementById('ejercicio'));
+    var chart = new google.visualization.LineChart(document.getElementById('ej_chart'));
     chart.draw(data, options);
 }
+
+google.charts.load('current', { packages: ['corechart', 'bar'] });
+google.charts.setOnLoadCallback(chart_column);
 
 function chart_column(ventas) {
     var data = new google.visualization.DataTable();

@@ -24,20 +24,26 @@
                 var indice = i;
                 var detalle = pedido.DetallePedidos[i];
 
-                <h5>Ítem #@(i + 1)</h5>
+                <div class="d-flex justify-content-between m-1">
+                    <h5>Ítem #@(i + 1)</h5>
+                    <div>
+                        <button type="button" @onclick="@(() => pedido.DetallePedidos.RemoveAt(indice))" class="btn btn-danger btn-sm" style="border-radius:10px">
+                            <i class="oi oi-trash"></i><text style="color:white">Quitar ítem @(indice+1)</text>
+                        </button>
+                    </div>
+                </div>
 
                 <div class="card mb-2" style="background-color:lightgrey; border-radius:0.5rem">
                     <div class="row ml-1 mt-1">
-                        <div class="col-5">
+                        <div class="col-8">
                             <label>Artículo </label>
                         </div>
-                        <div class="col">
+                        <div class="col-4">
                             <label>Cantidad </label>
                         </div>
-                        <div class="col"></div>
                     </div>
                     <div class="row ml-1 mb-1">
-                        <div class="col-5">
+                        <div class="col-8">
                             <InputSelect @bind-Value="detalle.ArticuloId" required class="form-control">
                                 <option selected value="">Seleccione un artículo</option>
                                 @foreach (var articulo in articulos)
@@ -47,14 +53,9 @@
                             </InputSelect>
                             <ValidationMessage For="@(() => detalle.ArticuloId)" />
                         </div>
-                        <div class="col">
+                        <div class="col-4">
                             <InputNumber @bind-Value="detalle.Cantidad" class="form-control" min="1" />
                             <ValidationMessage For="@(() => detalle.Cantidad)" />
-                        </div>
-                        <div class="col">
-                            <button type="button" @onclick="@(() => pedido.DetallePedidos.RemoveAt(indice))" class="btn btn-danger btn-sm" style="border-radius:10px">
-                                <i class="oi oi-trash"></i><text style="color:white"> Quitar ítem @(indice+1)</text>
-                            </button>
                         </div>
                     </div>
                 </div>

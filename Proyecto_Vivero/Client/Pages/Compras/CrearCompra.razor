@@ -1,0 +1,46 @@
+﻿@page "/crear-compra"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize]
+
+@using Proyecto_Vivero.Shared
+
+<h3><b>Nueva compra</b></h3>
+
+<FormCompra textSubmit=" Cargar compra" OnValidSubmit="CrearCompr" compra="compra"
+           ocultasubmit=false articulos="articulos"></FormCompra>
+
+@code {
+    public Compra compra = new Compra();
+    public List<Articulo> articulos { get; set; } = new List<Articulo>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        articulos = await Http.GetFromJsonAsync<List<Articulo>>("api/articulos"); //muestro todos los articulos
+    }
+
+    async Task CrearCompr()
+    {
+        var confirmacion = await JS.InvokeAsync<bool>("confirmar", "¿Finalizar compra?",
+            $"Total: ${compra.Total}. Proveedor: {compra.Proveedor}", "question");
+        if (confirmacion)
+        {
+            var respuesta = await Http.PostAsJsonAsync("api/compras", compra);
+            var cuerporespuest = await respuesta.Content.ReadAsStringAsync();
+
+            if (respuesta.IsSuccessStatusCode)
+            {
+                NavigationManager.NavigateTo("lista-compras/");
+                await JS.InvokeVoidAsync("simple", "¡Éxito!", "Compra cargada", "success");
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("simple", "Error", "No se pudo cargar compra", "error");
+            }
+        }
+    }
+}

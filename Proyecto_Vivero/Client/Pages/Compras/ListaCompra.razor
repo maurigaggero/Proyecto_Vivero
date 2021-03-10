@@ -1,0 +1,139 @@
+﻿@page "/lista-compras"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize]
+
+@using System.Text.Json
+@using Proyecto_Vivero.Shared
+
+<div class="d-flex position-sticky justify-content-between mb-1">
+    <div class="btn-group mr-2">
+        <button @onclick="CrearCompra" class="btn btn-success"><i class="oi oi-plus"></i> Nueva compra</button>
+    </div>
+    <div class="input-group" style="width:60%">
+        <input class="form-control" type="date" placeholder="Fecha compra" @bind="FechaFiltro" />
+        <input class="form-control" type="text" placeholder="Nombre empleado" @bind="EmpleadoFiltro" />
+        <div class="input-group-append">
+            <button @onclick="Filtrar" class="btn btn-primary" type="button"><i class="oi oi-magnifying-glass"></i></button>
+            <button @onclick="Limpiar" class="btn btn-danger" type="button"><i class="oi oi-delete"></i></button>
+        </div>
+    </div>
+</div>
+
+@if (compras == null)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height:24rem">
+        <div class="spinner-grow text-success" role="status">
+            <span class="sr-only">Cargando...</span>
+        </div>
+    </div>
+}
+else if (compras.Count == 0)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height:24rem">
+        <text>No se encontraron compras.</text>
+    </div>
+}
+else
+{
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th></th>
+                <th>#</th>
+                <th>Fecha</th>
+                <th>Proveedor</th>
+                <th>Empleado</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <Virtualize Items="@compras" Context="compra">
+                <tr @key="compra.Id">
+                    <td><button @onclick="@(() => BorrarCompra(compra))" class="btn btn-sm btn-danger"><i class="oi oi-trash"></i></button></td>
+                    <td>@compra.Id</td>
+                    <td>@compra.Fecha</td>
+                    <td>@compra.Proveedor</td>
+                    <td>@compra.ApplicationUser.NombreyApellido</td>
+                    <td><b>$@compra.Total</b></td>
+                </tr>
+            </Virtualize>
+        </tbody>
+    </table>
+}
+@code {
+    public List<Compra> compras { get; set; }
+
+    private DateTime FechaFiltro = DateTime.Today.AddDays(+1);
+    private string EmpleadoFiltro = String.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await CargarCompras();
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+    }
+
+    async Task CargarCompras()
+    {
+        string fecha = Convert.ToString(FechaFiltro);
+
+        var httpResponse = await Http.GetAsync($"api/compras/filtro?empleado={EmpleadoFiltro}&fecha={fecha}");
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            var responseString = await httpResponse.Content.ReadAsStringAsync();
+            compras = JsonSerializer.Deserialize<List<Compra>>(responseString,
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        }
+        else
+        {
+            Console.WriteLine("error");
+        }
+    }
+
+    async Task BorrarCompra(Compra compra)
+    {
+        var confirmacion = await JS.InvokeAsync<bool>("confirmar", "¿Eliminar compra?",
+            $"Pago N° {compra.Id}. Fecha: {compra.Fecha}. Proveedor: {compra.Proveedor}", "warning");
+        if (confirmacion)
+        {
+            var respuesta = await Http.DeleteAsync($"/api/compras/{compra.Id}");
+
+            if (respuesta.IsSuccessStatusCode)
+            {
+                await CargarCompras();
+                await JS.InvokeVoidAsync("simple", "¡Exito!", "Compra eliminado", "success");
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("simple", "Error", "No se pudo eliminar compra", "error");
+            }
+        }
+    }
+
+    void CrearCompra()
+    {
+        NavigationManager.NavigateTo("crear-compra");
+    }
+
+    private async Task Filtrar()
+    {
+        await CargarCompras();
+    }
+
+    private async Task Limpiar()
+    {
+        EmpleadoFiltro = string.Empty;
+        FechaFiltro = DateTime.Today.AddDays(+1);
+        await CargarCompras();
+    }
+}

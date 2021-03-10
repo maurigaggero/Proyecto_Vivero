@@ -38,8 +38,10 @@ namespace Proyecto_Vivero.Shared
         [Range(1, 99999999, ErrorMessage = "Valor inválido")]
         public int Cantidad { get; set; }
         [Required]
+        [Range(1, 99999999, ErrorMessage = "Valor inválido")]
         public decimal PrecioMayorista { get; set; }
         [Required]
+        [Range(1, 99999999, ErrorMessage = "Valor inválido")]
         public decimal PrecioUnitario { get; set; }
         public decimal SubTotal => PrecioMayorista * Cantidad;
         [Required]

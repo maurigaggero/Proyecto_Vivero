@@ -106,7 +106,7 @@
     async Task BorrarPago(int idpago)
     {
         var confirmacion = await JS.InvokeAsync<bool>("confirmar", "¿Eliminar pago?",
-            $"Pago N° {pago.Id}. Fecha: {pago.Fecha}", "warning");
+            $"Cliente {pago.Cliente.NombreyApellido}. Fecha: {pago.Fecha}", "warning");
         if (confirmacion)
         {
             var respuesta = await Http.DeleteAsync($"/api/pagos/{idpago}");

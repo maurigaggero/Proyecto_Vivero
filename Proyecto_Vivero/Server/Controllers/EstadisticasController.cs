@@ -42,6 +42,23 @@ namespace Proyecto_Vivero.Server.Controllers
             return meses;
         }
 
+        ////GET: api/estadisticas/compras/
+        [HttpGet("compras")]
+        public decimal[] GetCompras()
+        {
+            int año = DateTime.Today.Year;
+
+            decimal[] meses = new decimal[12];
+
+            for (int i = 1; i < meses.Length; i++)
+            {
+                meses[i - 1] = context.Compras
+                .Where(x => x.Fecha.Date.Month == i && x.Fecha.Date.Year == año)
+                .Sum(x => x.Total);
+            }
+            return meses;
+        }
+
         ////GET: api/estadisticas/ventas/
         [HttpGet("ventas")]
         public decimal[] GetVentas()
