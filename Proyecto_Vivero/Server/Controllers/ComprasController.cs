@@ -132,8 +132,6 @@ namespace Proyecto_Vivero.Server.Controllers
             {
                 var articulo = lista_articulo.First(x => x.Id == detalle.ArticuloId);
                 articulo.StockActual = articulo.StockActual - detalle.Cantidad;
-                articulo.PrecioMayorista = detalle.PrecioMayorista;
-                articulo.PrecioUnitario = detalle.PrecioUnitario;
                 await articulos.Put(articulo);
             }
         }

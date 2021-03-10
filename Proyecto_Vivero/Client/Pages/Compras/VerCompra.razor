@@ -1,0 +1,63 @@
+﻿@page "/ver-compra/{idcompra:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize]
+
+@using Proyecto_Vivero.Shared
+
+<div class="d-flex justify-content-between mb-3">
+    <div class="btn-group">
+        <button @onclick="@Volver" class="btn btn-sm btn-secondary">
+            <i class="oi oi-arrow-circle-left"></i> Volver al listado
+        </button>
+        <button @onclick="@(() => BorrarCompra(idcompra))" class="btn btn-sm btn-danger">
+            <i class="oi oi-trash"></i> Eliminar compra
+        </button>
+    </div>
+    <div>
+        <h3><b>Ver compra</b></h3>
+    </div>
+</div>
+
+<FormCompra textSubmit=" Guardar cambios" compra="compra" ocultabtn="true" articulos="articulos"></FormCompra>
+
+@code {
+    public Compra compra = new Compra();
+    public List<Articulo> articulos { get; set; } = new List<Articulo>();
+    [Parameter] public int idcompra { get; set; } //parametro id compra
+
+    protected override async Task OnInitializedAsync()
+    {
+        compra = await Http.GetFromJsonAsync<Compra>($"api/compras/{idcompra}"); //traigo id del parametro
+        articulos = await Http.GetFromJsonAsync<List<Articulo>>("api/articulos"); //muestro todos los articulos
+    }
+
+    async Task BorrarCompra(int idcompra)
+    {
+        var confirmacion = await JS.InvokeAsync<bool>("confirmar", "¿Eliminar compra?",
+            $"Pago N° {compra.Id}. Fecha: {compra.Fecha}. Proveedor: {compra.Proveedor}", "warning");
+        if (confirmacion)
+        {
+            var respuesta = await Http.DeleteAsync($"/api/compras/{idcompra}");
+
+            if (respuesta.IsSuccessStatusCode)
+            {
+                NavigationManager.NavigateTo("/lista-compras");
+                await JS.InvokeVoidAsync("simple", "¡Exito!", "Compra eliminada", "success");
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("simple", "Error", "No se pudo eliminar compra", "error");
+            }
+        }
+    }
+
+    void Volver()
+    {
+        NavigationManager.NavigateTo("/lista-compras");
+    }
+}
