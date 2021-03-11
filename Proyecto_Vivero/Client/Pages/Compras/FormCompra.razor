@@ -39,10 +39,7 @@
                                 <option selected value="">Seleccione un artículo</option>
                                 @foreach (var articulo in articulos)
                                     {
-                                        if (articulo.StockActual > 0)
-                                        {
-                                        <option value="@articulo.Id">@articulo.Nombre | $@articulo.PrecioUnitario | STOCK: @articulo.StockActual</option>
-                                        }
+                                    <option value="@articulo.Id">@articulo.Nombre | $@articulo.PrecioUnitario | STOCK: @articulo.StockActual</option>
                                     }
                             </InputSelect>
                             <ValidationMessage For="@(() => detalle.ArticuloId)" />
