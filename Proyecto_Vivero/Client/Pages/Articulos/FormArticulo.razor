@@ -81,12 +81,9 @@
                     <label class="col-4 col-form-label">Porcentaje</label>
                     <div class="col">
                         <div class="input-group">
-                            <InputNumber @bind-Value="@porcentaje" class="form-control" />
+                            <InputNumber @bind-Value="@porcentaje" @onfocusout="@(() => articulo.CalcularUnitario(porcentaje))" class="form-control" />
                             <div class="input-group-append">
                                 <span class="input-group-text">%</span>
-                                <button @onclick="@(() => articulo.CalcularUnitario(porcentaje))" class="btn btn-secondary" type="button">
-                                    <text>Calcular</text>
-                                </button>
                             </div>
                         </div>
                     </div>

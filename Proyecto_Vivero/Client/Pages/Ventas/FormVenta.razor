@@ -123,8 +123,8 @@
                 </button>
             </div>
 
-            <div class="d-flex justify-content-end">
-                <button @onclick="@(() => CalcularTotal())" type="button" class="btn btn-light">
+            <div class="d-flex justify-content-end py-2">
+                <button @onclick="@(() => CalcularTotal())" type="button" class="btn btn-outline-dark" style="border:none">
                     <h4><b>TOTAL</b></h4>
                     @if (venta.Total != 0)
                     {

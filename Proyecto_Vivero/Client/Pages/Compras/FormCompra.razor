@@ -61,12 +61,7 @@
                         <div class="col-3 form-group">
                             <label><small>Porcentaje</small></label>
                             <div class="input-group">
-                                <InputNumber @bind-Value="@porcentaje" class="form-control form-control-sm" />
-                                <div class="input-group-append">
-                                    <button @onclick="@(() => detalle.CalcularUnitario(porcentaje))" class="btn btn-sm btn-secondary" type="button">
-                                        <i class="oi oi-calculator"></i>
-                                    </button>
-                                </div>
+                                <InputNumber @bind-Value="@porcentaje" @onfocusout="@(() => detalle.CalcularUnitario(porcentaje))" class="form-control form-control-sm" />
                             </div>
                         </div>
 
@@ -95,8 +90,8 @@
                 </button>
             </div>
 
-            <div class="d-flex justify-content-end">
-                <button @onclick="@(() => CalcularTotal())" type="button" class="btn btn-light">
+            <div class="d-flex justify-content-end py-2">
+                <button @onclick="@(() => CalcularTotal())" type="button" class="btn btn-outline-dark" style="border:none">
                     <h4><b>TOTAL</b></h4>
                     @if (compra.Total != 0)
                     {
