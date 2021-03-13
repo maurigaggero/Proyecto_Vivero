@@ -11,10 +11,6 @@
     color: black;
 }
 
-    .form-control:hover {
-        background-color: rgb(255,255,255);
-    }
-
 .table {
     background-color: rgb(237,237,237,0.6);
 }
