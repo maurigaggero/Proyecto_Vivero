@@ -6,16 +6,21 @@
     vertical-align: middle;
 }
 
+.form-control {
+    background-color: rgb(255,255,255, 0.85);
+    color: black;
+}
+
+    .form-control:hover {
+        background-color: rgb(255,255,255);
+    }
+
 .table {
-    background-color: #ededed;
+    background-color: rgb(237,237,237,0.6);
 }
 
 .table-hover tbody tr:hover {
-    background-color: white;
-}
-
-.card:hover {
-    box-shadow: 0 0 12px rgba(33,33,33,.2);
+    background-color: rgb(255,255,255,0.7);
 }
 
 body {

@@ -26,7 +26,7 @@
     async Task CreaPago()
     {
         var confirmacion = await JS.InvokeAsync<bool>("confirmar", "¿Confirmar pago?",
-            $"Cliente {pago.ClienteId}. Importe: ${pago.Importe}", "question");
+            $"Cliente {pago.ClienteId}. Importe: ${pago.Importe}. Forma de pago: {pago.FormaPago}.", "question");
         if (confirmacion)
         {
             var respuesta = await Http.PostAsJsonAsync("api/pagos", pago);

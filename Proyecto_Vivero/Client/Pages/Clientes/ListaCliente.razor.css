@@ -1,0 +1,11 @@
+﻿.card {
+    background-color: lightskyblue;
+    border-style: groove;
+    border-radius: 8px;
+    text-align: left;
+}
+
+    .card:hover {
+        box-shadow: 0 0 12px rgba(33,33,33,.2);
+        opacity: 0.95;
+    }

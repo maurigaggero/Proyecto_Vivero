@@ -59,7 +59,7 @@ else
         @foreach (var cliente in clientes)
         {
             <a href="/editar-cliente/@cliente.Id" style="color: inherit">
-                <div class="card" style="background-color:lightblue; border-style:groove; border-radius:8px;">
+                <div class="card">
                     @if (cliente.Sexo == Cliente.Sexos.Masculino)
                     {
                         <img class="card-img-top" src="img/masculino.png" alt="Cliente" />

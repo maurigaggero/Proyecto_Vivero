@@ -59,7 +59,7 @@ else
         @foreach (var articulo in articulo)
         {
             <a href="/editar-articulo/@articulo.Id" style="color: inherit">
-                <div class="card text-right" style="background-color:lightgoldenrodyellow;">
+                <div class="card">
                     @if (articulo.Url_Imagen == null || articulo.Url_Imagen == "")
                     {
                         <img class="card-img-top" src="img/noimage.png" alt="Card image cap">
