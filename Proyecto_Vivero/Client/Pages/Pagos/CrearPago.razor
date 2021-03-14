@@ -3,12 +3,7 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @attribute [Authorize]
-
-@using Proyecto_Vivero.Shared
-
 <h3><b>Nuevo pago</b></h3>
 
 <FormPago textSubmit=" Finalizar pago" OnValidSubmit="CreaPago" pago="pago"

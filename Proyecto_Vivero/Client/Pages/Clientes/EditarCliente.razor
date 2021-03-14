@@ -3,11 +3,7 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @attribute [Authorize]
-
-@using Proyecto_Vivero.Shared
 
 <button @onclick="@Volver" class="btn btn-sm btn-secondary">
     <i class="oi oi-arrow-circle-left"></i> Volver al listado
