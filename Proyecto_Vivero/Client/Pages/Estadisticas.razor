@@ -2,6 +2,8 @@
 @inject HttpClient Http
 @inject IJSRuntime JS
 
+@attribute [Authorize]
+
 @if (ventas == null)
 {
     <div class="d-flex justify-content-between">
@@ -52,10 +54,10 @@ else
 </div>
 
 @code {
-    public int pedidospendientes { get; set; }
-    decimal[] ejercicio { get; set; }
-    decimal[] ventasAño { get; set; }
-    decimal[] compras { get; set; }
+    private int pedidospendientes { get; set; }
+    private decimal[] ejercicio { get; set; }
+    private decimal[] ventasAño { get; set; }
+    private decimal[] compras { get; set; }
 
     public List<Venta> ventas { get; set; }
 

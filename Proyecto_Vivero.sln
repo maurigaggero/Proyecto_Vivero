@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31005.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Proyecto_Vivero.Server", "Proyecto_Vivero\Server\Proyecto_Vivero.Server.csproj", "{71263607-E15E-44C3-8DAF-387C0667A1EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Proyecto_Vivero.Server", "Proyecto_Vivero\Server\Proyecto_Vivero.Server.csproj", "{71263607-E15E-44C3-8DAF-387C0667A1EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Proyecto_Vivero.Client", "Proyecto_Vivero\Client\Proyecto_Vivero.Client.csproj", "{CF4404C1-32E0-40A8-85F7-32D00C5AD533}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Proyecto_Vivero.Client", "Proyecto_Vivero\Client\Proyecto_Vivero.Client.csproj", "{CF4404C1-32E0-40A8-85F7-32D00C5AD533}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Proyecto_Vivero.Shared", "Proyecto_Vivero\Shared\Proyecto_Vivero.Shared.csproj", "{AEF1C8CC-FFFE-44EC-BFD8-D4F369F47281}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Proyecto_Vivero.Shared", "Proyecto_Vivero\Shared\Proyecto_Vivero.Shared.csproj", "{AEF1C8CC-FFFE-44EC-BFD8-D4F369F47281}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

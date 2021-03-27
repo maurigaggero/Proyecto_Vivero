@@ -22,17 +22,20 @@ namespace Proyecto_Vivero.Server.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
+            RoleManager<IdentityRole> roleManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
             _logger = logger;
             _emailSender = emailSender;
         }
@@ -82,8 +85,20 @@ namespace Proyecto_Vivero.Server.Areas.Identity.Pages.Account
             {
                 var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, NombreyApellido = Input.NombreyApellido };
                 var result = await _userManager.CreateAsync(user, Input.Password);
+
                 if (result.Succeeded)
                 {
+                    if ((_userManager.GetUsersInRoleAsync("Admin").Result.Count() == 0) && user.NombreyApellido == "Admin")
+                    {
+                        ///crea roles
+                        await _roleManager.CreateAsync(new IdentityRole("Admin"));
+                        await _roleManager.CreateAsync(new IdentityRole("Propietario"));
+                        await _roleManager.CreateAsync(new IdentityRole("Empleado"));
+
+                        //asigna rol de admin al primer usuario
+                        await _userManager.AddToRoleAsync(user, "Admin");
+                    }
+
                     _logger.LogInformation("User created a new account with password.");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

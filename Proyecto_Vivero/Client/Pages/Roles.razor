@@ -1,0 +1,86 @@
+﻿@page "/roles"
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+@using Microsoft.AspNetCore.Identity
+
+<div class="form-group">
+    <label>Usuario</label>
+    <select @bind="@usuarioId" class="custom-select">
+        <option selected disabled> Seleccione usuario</option>
+        @foreach (var usuario in usuarios)
+        {
+        <option value="@usuario.Id">@usuario.NombreyApellido</option>
+        }
+    </select>
+    <label>Rol</label>
+    <select @bind="@nombreRol" class="custom-select">
+        <option selected disabled> Seleccione rol</option>
+        @foreach (var rol in roles)
+        {
+        <option value="@rol.Name">@rol.Name</option>
+        }
+    </select>
+    <div class="btn-group btn-block my-2">
+        <button @onclick="@(() => AccionRol(nombreRol, usuarioId, true))" class="btn btn-primary"> Asignar rol</button>
+    </div>
+    <div class="btn-group btn-block">
+        <button @onclick="@(() => AccionRol(nombreRol, usuarioId, false))" class="btn btn-danger"> Eliminar rol</button>
+    </div>
+</div>
+
+@code {
+    private List<IdentityRole> roles = new List<IdentityRole>();
+    private List<ApplicationUser> usuarios = new List<ApplicationUser>();
+
+    private string nombreRol { get; set; }
+    private string usuarioId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        roles = await Http.GetFromJsonAsync<List<IdentityRole>>($"api/roles/");
+        usuarios = await Http.GetFromJsonAsync<List<ApplicationUser>>($"api/roles/usuarios");
+    }
+
+    async Task AccionRol(string nombreRol, string usuarioId, bool crear)
+    {
+        var mensaje = "";
+
+        if (nombreRol != null && usuarioId != null)
+        {
+            if (crear == true)
+            {
+                mensaje = "¿Asignar rol?";
+            }
+            else
+            {
+                mensaje = "¿Eliminar rol?";
+            }
+
+            var confirmacion = await JS.InvokeAsync<bool>("confirmar", mensaje,
+        $"Usuario: {usuarioId}. Rol:{nombreRol}", "question");
+            if (confirmacion)
+            {
+                var rol = await Http.GetFromJsonAsync<IdentityRole>($"api/roles/rol/" + nombreRol);
+                var respuesta = await Http.PostAsJsonAsync<IdentityRole>($"api/roles/{usuarioId}/{crear}", rol);
+
+                if (respuesta.IsSuccessStatusCode && crear == true)
+                {
+                    await JS.InvokeVoidAsync("simple", "¡Éxito!", "Rol asignado", "success");
+                }
+                else if (respuesta.IsSuccessStatusCode && crear == false)
+                {
+                    await JS.InvokeVoidAsync("simple", "¡Éxito!", "Rol eliminado", "success");
+                }
+                else
+                {
+                    await JS.InvokeVoidAsync("simple", "Error", "No se pudo asignar rol", "error");
+                }
+            }
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("simple", "Error", "Seleccione usuario y rol.", "error");
+        }
+    }
+}
