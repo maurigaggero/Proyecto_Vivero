@@ -6,7 +6,25 @@
 
 <AuthorizeView>
     <Authorized>
-        <a class="btn btn-sm btn-outline-primary mr-2" href="authentication/profile">@context.User.Identity.Name</a>
+        <style>
+            #usuario {
+                color: lightseagreen;
+                margin-right: 1rem;
+                border-radius: 0.2rem;
+            }
+
+                #usuario:hover {
+                    text-decoration: none;
+                    color: white;
+                }
+
+                #usuario:active {
+                    color:gold;
+                }
+        </style>
+        <a href="authentication/profile" id="usuario">
+            @context.User.Identity.Name
+        </a>
         <button class="btn btn-sm btn-outline-danger" @onclick="BeginSignOut"><i class="oi oi-account-logout"></i>Salir</button>
     </Authorized>
     <NotAuthorized>

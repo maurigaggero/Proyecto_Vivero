@@ -5,9 +5,9 @@
 @using Microsoft.AspNetCore.Identity
 
 <div class="form-group">
-    <label>Usuario</label>
+    <label>Empleado</label>
     <select @bind="@usuarioId" class="custom-select">
-        <option selected disabled> Seleccione usuario</option>
+        <option selected disabled> Seleccione empleado</option>
         @foreach (var usuario in usuarios)
         {
         <option value="@usuario.Id">@usuario.NombreyApellido</option>
